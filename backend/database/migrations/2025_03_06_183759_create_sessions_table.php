@@ -9,13 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::create('sessions', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('movie_id')->constrained()->onDelete('cascade'); // Relación con la tabla `movies`
+        $table->date('date'); // Fecha de la sesión
+        $table->time('time'); // Hora de la sesión
+        $table->boolean('is_special')->default(false); // Indica si es una sesión especial (ej. día del espectador)
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

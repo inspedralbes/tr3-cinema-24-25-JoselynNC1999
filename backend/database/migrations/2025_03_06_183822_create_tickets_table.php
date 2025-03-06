@@ -9,13 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('tickets', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::create('tickets', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con la tabla `users`
+        $table->foreignId('session_id')->constrained()->onDelete('cascade'); // Relación con la tabla `sessions`
+        $table->foreignId('seat_id')->constrained()->onDelete('cascade'); // Relación con la tabla `seats`
+        $table->decimal('price', 8, 2); // Precio de la entrada
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.
