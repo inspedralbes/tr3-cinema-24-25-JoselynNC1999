@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::create('seats', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('session_id')->constrained()->onDelete('cascade'); // Relación con la tabla `sessions`
+        $table->foreignId('session_id')->constrained('sessions_Movie')->onDelete('cascade');
         $table->string('row'); // Fila de la butaca (ej. "A", "B", etc.)
         $table->integer('number'); // Número de la butaca (ej. 1, 2, etc.)
         $table->enum('status', ['available', 'occupied', 'selected'])->default('available'); // Estado de la butaca

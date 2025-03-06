@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::create('sessions', function (Blueprint $table) {
+    Schema::create('sessions_Movie', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('movie_id')->constrained()->onDelete('cascade'); // Relación con la tabla `movies`
+        $table->foreignId('movie_id')->constrained('movies')->onDelete('cascade'); // Relación con la tabla `movies`
         $table->date('date'); // Fecha de la sesión
         $table->time('time'); // Hora de la sesión
         $table->boolean('is_special')->default(false); // Indica si es una sesión especial (ej. día del espectador)
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('sessions_Movie');
     }
 };
