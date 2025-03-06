@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::create('sessions_Movie', function (Blueprint $table) {
+    Schema::create('session_movies', function (Blueprint $table) {
         $table->id();
         $table->foreignId('movie_id')->constrained('movies')->onDelete('cascade'); // Relación con la tabla `movies`
         $table->date('date'); // Fecha de la sesión
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sessions_Movie');
+        Schema::dropIfExists('session_movies');
     }
 };

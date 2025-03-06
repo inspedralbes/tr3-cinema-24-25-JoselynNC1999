@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con la tabla `users`
-            $table->foreignId('session_id')->constrained('sessions_Movie')->onDelete('cascade'); // Relación con la tabla `sessions_Movie`
+            $table->foreignId('session_id')->constrained('session_movies')->onDelete('cascade'); // Relación con la tabla `sessions_Movie`
             $table->foreignId('seat_id')->constrained()->onDelete('cascade'); // Relación con la tabla `seats`
             $table->decimal('price', 8, 2); // Precio de la entrada
             $table->timestamps();
