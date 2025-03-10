@@ -37,15 +37,15 @@ services:
     command: bash -c "chmod +x entrypoint.sh && ./entrypoint.sh"
     #command: bash -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0"
 
-  frontend:
+  front:
     build: 
-      context: ./frontend
+      context: ./front
       dockerfile: Dockerfile
     container_name: vue
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./front:/app
     environment:
       - NODE_ENV=development
     restart: unless-stopped
