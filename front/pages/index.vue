@@ -3,7 +3,7 @@
       <LandingPageHeader  />
     <LandindPageFeaturesCard />
     <LandingPageHero/>
-    <LandingPageMovieCard/>
+    <LandingPageFeatures/>
     <LandingPageMovieGallery />
     <LandingPagePromoSection />
     <LandingPageNewsletter />
@@ -14,7 +14,7 @@
 
 <script setup>
 
-import { LandingPageHeader, LandingPageMovieCard, LandingPageMovieGallery, LandingPageNewsletter, LandingPagePromoSection, LandingPageSocialIcons } from '#components';
+import { LandingPageFeatures, LandingPageHeader, LandingPageMovieGallery, LandingPageNewsletter, LandingPagePromoSection, LandingPageSocialIcons } from '#components';
 
 
 </script>
