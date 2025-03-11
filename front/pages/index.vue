@@ -5,7 +5,7 @@
     <LandingPageHero/>
     <LandingPageFeatures/>
     <LandingPageMovieGallery />
-    <LandingPagePromoSection />
+    <PromoSection />
     <LandingPageNewsletter />
     <LandingPageSocialIcons/>
     <TheFooter class="mt-auto" />
@@ -14,10 +14,10 @@
 
 <script setup>
 
-import { LandingPageFeatures, LandingPageMovieGallery, LandingPageNewsletter, LandingPagePromoSection, LandingPageSocialIcons } from '#components';
+import { LandingPageFeatures, LandingPageMovieGallery, LandingPageNewsletter, LandingPageSocialIcons } from '#components';
 
 import TheFooter from '@/components/layout/TheFooter.vue';
-import TheHeader from '@/components/layout/TheHeader.vue'
-
+import TheHeader from '@/components/layout/TheHeader.vue';
+import PromoSection from '~/components/layout/PromoSection.vue'
 
 </script>
