@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
-      <LandingPageHeader  />
+      <TheHeader  />
     <LandindPageFeaturesCard />
     <LandingPageHero/>
     <LandingPageFeatures/>
@@ -8,13 +8,16 @@
     <LandingPagePromoSection />
     <LandingPageNewsletter />
     <LandingPageSocialIcons/>
-    <LandingPageFooter class="mt-auto" />
+    <TheFooter class="mt-auto" />
   </div>
 </template>
 
 <script setup>
 
-import { LandingPageFeatures, LandingPageHeader, LandingPageMovieGallery, LandingPageNewsletter, LandingPagePromoSection, LandingPageSocialIcons } from '#components';
+import { LandingPageFeatures, LandingPageMovieGallery, LandingPageNewsletter, LandingPagePromoSection, LandingPageSocialIcons } from '#components';
+
+import TheFooter from '@/components/layout/TheFooter.vue';
+import TheHeader from '@/components/layout/TheHeader.vue'
 
 
 </script>

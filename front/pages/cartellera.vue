@@ -9,6 +9,7 @@
       <MovieGrid />
       <PaginationControls/>
       <NewsletterSection />
+      <TheFooter class="mt-auto" />
     </div>
   </template>
   
@@ -19,5 +20,6 @@
   import MovieGrid from '@/components/sections/MovieGrid.vue'
   import PaginationControls from '@/components/ui/PaginationControls.vue'
   import NewsletterSection from '@/components/sections/NewsletterSection.vue'
+  import TheFooter from '@/components/layout/TheFooter.vue'
   </script>
   
