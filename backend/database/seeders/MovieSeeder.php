@@ -14,7 +14,7 @@ class MovieSeeder extends Seeder
     public function run(): void
     {
         $movies = [
-            ['title' => 'Avengers: Endgame', 'description' => 'A superhero action movie', 'poster_url' => 'https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_SY679_.jpg', 'duration' => 181],
+            ['title' => 'Avengers: Endgame', 'description' => 'A superhero action movie', 'poster_url' => 'https://m.media-amazon.com/images/I/91HrMmvyEUL.jpg', 'duration' => 181],
             ['title' => 'The Dark Knight', 'description' => 'Batman facing the Joker', 'poster_url' => 'https://m.media-amazon.com/images/I/71p8G+eKfTL._AC_SY679_.jpg', 'duration' => 152],
             ['title' => 'Inception', 'description' => 'A mind-bending sci-fi thriller', 'poster_url' => 'https://m.media-amazon.com/images/I/51XB1aCspqL._AC_.jpg', 'duration' => 148],
             ['title' => 'Interstellar', 'description' => 'A journey through space and time', 'poster_url' => 'https://m.media-amazon.com/images/I/91kFYg4fX3L._AC_SY679_.jpg', 'duration' => 169],
