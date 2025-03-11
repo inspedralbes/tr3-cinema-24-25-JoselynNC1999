@@ -12,9 +12,10 @@
   </template>
   
   <script setup>
-  import TheHeader from '~/components/layout/TheHeader.vue'
-  import HeroSection from '~/components/sections/HeroSection.vue'
-  import MovieFilters from '~/components/sections/MovieFilters.vue'
-  import MovieGrid from '~/components/sections/MovieGrid.vue'
-  import NewsletterSection from '~/components/sections/NewsletterSection.vue'
+  import TheHeader from '@/components/layout/TheHeader.vue'
+  import HeroSection from '@/components/sections/HeroSection.vue'
+  import MovieFilters from '@/components/sections/MovieFilters.vue'
+  import MovieGrid from '@/components/sections/MovieGrid.vue'
+  import NewsletterSection from '@/components/sections/NewsletterSection.vue'
   </script>
+  
