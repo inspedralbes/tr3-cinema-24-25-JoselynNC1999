@@ -7,6 +7,7 @@
       />
       <MovieFilters />
       <MovieGrid />
+      <PaginationControls/>
       <NewsletterSection />
     </div>
   </template>
@@ -16,6 +17,7 @@
   import HeroSection from '@/components/sections/HeroSection.vue'
   import MovieFilters from '@/components/sections/MovieFilters.vue'
   import MovieGrid from '@/components/sections/MovieGrid.vue'
+  import PaginationControls from '@/components/ui/PaginationControls.vue'
   import NewsletterSection from '@/components/sections/NewsletterSection.vue'
   </script>
   
