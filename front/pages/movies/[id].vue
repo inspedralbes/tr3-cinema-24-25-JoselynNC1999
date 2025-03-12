@@ -2,6 +2,11 @@
   <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
     <TheHeader />
     <div class="container mx-auto px-4 py-8">
+      <Breadcrumb v-if="movie" :items="[
+        { name: 'Inici', path: '/' },
+        { name: 'Películas', path: '/movies' },
+        { name: movie.title, path: '#', current: true }
+      ]" />
       <div v-if="movie" class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Poster -->
         <div class="md:col-span-1 flex justify-center">
@@ -21,7 +26,7 @@
               {{ time }}
             </div>
           </div>
-          
+        
           <button class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105">
             Comprar entrades
           </button>
@@ -32,6 +37,8 @@
         <p class="text-xl">Carregant informació de la pel·lícula...</p>
       </div>
     </div>
+    <PromoSection class="my-12" />
+    <NewsletterSection class="mt-16" />
     <TheFooter />
   </div>
 </template>
