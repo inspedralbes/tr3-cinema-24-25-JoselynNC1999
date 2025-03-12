@@ -34,9 +34,10 @@
         </div>
       </div>
       
-      <NuxtLink :to="`/movies/${slug}`" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105">
+      <NuxtLink :to="`/movies/${id}`" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105">
         Comprar entrades
       </NuxtLink>
+
     </div>
   </div>
 </template>
@@ -67,9 +68,10 @@ defineProps({
     default: () => ['16:30', '19:15', '22:00']
   },
   poster_url: String,
-  slug: {
-    type: String,
-    required: true
+  id: {
+  type: Number,
+  required: true
   }
+
 });
 </script>
