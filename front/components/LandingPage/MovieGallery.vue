@@ -46,7 +46,7 @@ onMounted(() => {
 })
 
 defineProps({
-  title: { type: String, default: 'En cartellera' },
+  title: { type: String, default: 'Properes sessions' },
   subtitle: { type: String, default: 'Les millors estrenes i pel·lícules del moment' },
   buttonText: { type: String, default: 'Comprar entrades' },
   showAllLink: { type: String, default: '#' },
