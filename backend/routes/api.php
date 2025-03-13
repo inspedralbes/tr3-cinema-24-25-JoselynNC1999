@@ -7,6 +7,8 @@ use App\Http\Controllers\SessionMovieController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,5 +23,8 @@ Route::apiResource('users', UserController::class);
 // Ruta para obtener las sesiones de una película específica
 Route::get('/movies/{movie_id}/sessions', [SessionMovieController::class, 'getSessionsByMovie']);
 
-
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Route::apiResource('/admin/movie-sessions', MovieSessionController::class);
+});
 
