@@ -14,13 +14,12 @@ return new class extends Migration
     Schema::create('session_movies', function (Blueprint $table) {
         $table->id();
         $table->foreignId('movie_id')->constrained('movies')->onDelete('cascade'); // Relación con la tabla `movies`
-        $table->date('date'); // Fecha de la sesión
-        $table->time('time'); // Hora de la sesión
+        $table->date('date')->unique(); 
+        $table->enum('time', ['16:00', '18:00', '20:00']); // Horaris fixes
         $table->boolean('is_special')->default(false); // Indica si es una sesión especial (ej. día del espectador)
         $table->timestamps();
     });
 }
-
     /**
      * Reverse the migrations.
      */

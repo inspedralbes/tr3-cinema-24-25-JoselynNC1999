@@ -13,13 +13,24 @@ class SessionMovieController extends Controller
         return response()->json(SessionMovie::all());
     }
 
+    public function getSessionsByMovie($movie_id)
+    {
+        $sessions = SessionMovie::where('movie_id', $movie_id)->with('movie')->get();
+
+        if ($sessions->isEmpty()) {
+            return response()->json(['message' => 'No hay sesiones para esta película.'], 404);
+        }
+
+        return response()->json($sessions);
+    }
+
     // Guardar una nueva sesión
     public function store(Request $request)
     {
         $data = $request->validate([
             'movie_id'   => 'required|exists:movies,id',
-            'date'       => 'required|date',
-            'time'       => 'required|date_format:H:i:s', // Formato de hora correcto
+            'date'       => 'required|date|unique:sessions,date', // Solo una sesión por día
+            'time'       => ['required', Rule::in(['16:00', '18:00', '20:00'])], // Solo horarios válidos
             'is_special' => 'sometimes|boolean',
         ]);
 
@@ -38,8 +49,8 @@ class SessionMovieController extends Controller
     {
         $data = $request->validate([
             'movie_id'   => 'sometimes|required|exists:movies,id',
-            'date'       => 'sometimes|required|date',
-            'time'       => 'sometimes|required|date_format:H:i:s', // Se asegura de que el formato sea correcto
+            'date'       => ['sometimes', 'required', 'date', Rule::unique('sessions', 'date')->ignore($session->id)], // Asegura que no haya más de una sesión por día
+            'time'       => ['sometimes', 'required', Rule::in(['16:00', '18:00', '20:00'])], // Solo horarios válidos
             'is_special' => 'sometimes|boolean',
         ]);
 

@@ -6,14 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SessionMovie extends Model
 {
-
+    protected $table = 'session_movies';
     protected $fillable = [
         'movie_id',
         'date',
         'time',
         'is_special',
     ];
-
+    protected $casts = [
+        'is_special' => 'boolean',
+    ];
     // Cada sesión pertenece a una película
     public function movie()
     {

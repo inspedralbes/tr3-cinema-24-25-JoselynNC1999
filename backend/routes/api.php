@@ -18,5 +18,8 @@ Route::apiResource('seats', SeatController::class);
 Route::apiResource('tickets', TicketController::class);
 Route::apiResource('users', UserController::class);
 
+// Ruta para obtener las sesiones de una película específica
+Route::get('/movies/{movie_id}/sessions', [SessionMovieController::class, 'getSessionsByMovie']);
+
 
 
