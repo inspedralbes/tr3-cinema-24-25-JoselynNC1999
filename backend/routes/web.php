@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MovieController;
+
 
 
 Route::get('/', function () {
@@ -20,4 +22,5 @@ Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.
 // Ruta para mostrar el formulario de edición
 Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
 
+Route::resource('movies', MovieController::class)->except(['create', 'edit']);
 
