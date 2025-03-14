@@ -44,6 +44,7 @@
 
         <!-- Sessions -->
         <div class="col-span-1">
+        <a href="{{ route('sessions.index') }}" class="block">
                 <div class="card h-full bg-gray-100 hover:bg-gray-200 transition duration-300 ease-in-out rounded-lg shadow-md">
                     <div class="card-body text-center p-6">
                         <i class="fas fa-calendar-day fa-3x text-primary mb-4"></i>

@@ -1,76 +1,93 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\Controller;
+
 use App\Models\SessionMovie;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SessionMovieController extends Controller
 {
-    // Listar todas las sesiones de película
+    // Listar todas las sesiones (para web y API)
     public function index()
     {
-        return response()->json(SessionMovie::all());
-    }
+        $sessions = SessionMovie::with('movie')->get();
 
-    public function getSessionsByMovie($movie_id)
-    {
-        $sessions = SessionMovie::where('movie_id', $movie_id)->with('movie')->get();
-
-        if ($sessions->isEmpty()) {
-            return response()->json(['message' => 'No hay sesiones para esta película.'], 404);
+        if (request()->wantsJson()) {
+            return response()->json($sessions);
         }
 
-        return response()->json($sessions);
+        return view('sessions', compact('sessions'));
+    }
+
+    // Mostrar una sesión específica
+    public function show(SessionMovie $sessionMovie)
+    {
+        if (request()->wantsJson()) {
+            return response()->json($sessionMovie);
+        }
+
+        return view('sessions.show', compact('sessionMovie'));
     }
 
     // Guardar una nueva sesión
     public function store(Request $request)
     {
-        // Validar que no haya ya una sesión para ese día
         $request->validate([
-            'movie_id' => 'required|exists:movies,id',
-            'date' => 'required|date|unique:session_movies,date',
-            'time' => 'required|date_format:H:i:s',
+            'movie_id'   => 'required|exists:movies,id',
+            'date'       => 'required|date',
             'is_special' => 'sometimes|boolean',
         ]);
 
-        // Crear la nueva sesión
-        $session = SessionMovie::create([
-            'movie_id' => $request->movie_id,
-            'date' => $request->date,
-            'time' => $request->time,
-            'is_special' => $request->is_special ?? false,
-        ]);
+        // Horarios disponibles
+        $times = ['16:00', '18:00', '20:00'];
 
-        return response()->json($session, 201);
-    }
+        // Crear una sesión para cada horario
+        foreach ($times as $time) {
+            SessionMovie::create([
+                'movie_id'   => $request->movie_id,
+                'date'       => $request->date,
+                'time'       => $time,
+                'is_special' => $request->is_special ?? false,
+            ]);
+        }
 
-    // Mostrar una sesión en específico
-    public function show(SessionMovie $sessionMovie)
-    {
-        return response()->json($sessionMovie);
+        if ($request->wantsJson()) {
+            return response()->json(SessionMovie::where('date', $request->date)->get(), 201);
+        }
+
+        return redirect()->route('sessions.index')->with('success', 'Sessions creades correctament.');
     }
 
     // Actualizar una sesión
     public function update(Request $request, SessionMovie $sessionMovie)
     {
-        $data = $request->validate([
+        $request->validate([
             'movie_id'   => 'sometimes|required|exists:movies,id',
-            'date'       => ['sometimes', 'required', 'date', Rule::unique('sessions', 'date')->ignore($session->id)], // Asegura que no haya más de una sesión por día
-            'time'       => ['sometimes', 'required', Rule::in(['16:00', '18:00', '20:00'])], // Solo horarios válidos
+            'date'       => ['sometimes', 'required', 'date'],
+            'time'       => ['sometimes', 'required', 'date_format:H:i'],
             'is_special' => 'sometimes|boolean',
         ]);
 
-        $sessionMovie->update($data);
-        return response()->json($sessionMovie);
+        $sessionMovie->update($request->all());
+
+        if ($request->wantsJson()) {
+            return response()->json($sessionMovie);
+        }
+
+        return redirect()->route('sessions.index')->with('success', 'Sessió actualitzada correctament.');
     }
 
     // Eliminar una sesión
     public function destroy(SessionMovie $sessionMovie)
     {
         $sessionMovie->delete();
-        return response()->json(null, 204);
+
+        if (request()->wantsJson()) {
+            return response()->json(null, 204);
+        }
+
+        return redirect()->route('sessions.index')->with('success', 'Sessió eliminada correctament.');
     }
 }

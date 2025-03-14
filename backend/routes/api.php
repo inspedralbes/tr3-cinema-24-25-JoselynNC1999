@@ -28,3 +28,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('/admin/movie-sessions', MovieSessionController::class);
 });
 
+// Rutas para las sesiones
+Route::get('/sessions', [SessionMovieController::class, 'index']); // Listar todas las sesiones
+Route::get('/sessions/{id}', [SessionMovieController::class, 'show']); // Mostrar una sesión específica
+Route::post('/sessions', [SessionMovieController::class, 'store']); // Crear una nueva sesión
+Route::put('/sessions/{id}', [SessionMovieController::class, 'update']); // Actualizar una sesión
+Route::delete('/sessions/{id}', [SessionMovieController::class, 'destroy']); // Eliminar una sesión
+

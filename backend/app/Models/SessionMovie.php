@@ -16,6 +16,7 @@ class SessionMovie extends Model
     protected $casts = [
         'is_special' => 'boolean',
     ];
+
     // Cada sesión pertenece a una película
     public function movie()
     {
@@ -34,4 +35,3 @@ class SessionMovie extends Model
         return $this->hasMany(Ticket::class, 'session_id');
     }
 }
-

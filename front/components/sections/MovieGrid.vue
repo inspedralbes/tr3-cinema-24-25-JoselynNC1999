@@ -29,7 +29,7 @@ onMounted(() => {
       <template v-else>
         <h2 class="text-2xl font-bold mb-8 flex items-center">
           <span class="bg-blue-600 w-3 h-8 mr-3 rounded-sm"></span>
-          Estrenes destacades
+          Sessió d'avui
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">

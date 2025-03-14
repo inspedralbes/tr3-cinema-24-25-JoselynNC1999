@@ -2,36 +2,52 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\SessionMovie;
-use App\Models\Movie;
+use App\Models\Movie; // Importar el modelo Movie
 use Carbon\Carbon;
 
 class SessionMovieSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
+        // Obtener todas las películas disponibles
         $movies = Movie::all();
 
+        // Verificar que haya películas en la base de datos
         if ($movies->isEmpty()) {
-            $this->command->warn('No hay películas en la base de datos. Ejecuta primero MovieSeeder.');
+            $this->command->error('No hay películas en la base de datos. Crea algunas películas primero.');
             return;
         }
 
-        $sessions = [
-            ['date' => now()->addDays(1)->toDateString(), 'time' => '16:00', 'is_special' => false],
-            ['date' => now()->addDays(2)->toDateString(), 'time' => '18:00', 'is_special' => false],
-            ['date' => now()->addDays(3)->toDateString(), 'time' => '20:00', 'is_special' => true], // Sesión especial
-        ];
-
-        foreach ($sessions as $session) {
-            SessionMovie::create([
-                'movie_id'   => $movies->random()->id,
-                'date'       => $session['date'],
-                'time'       => $session['time'],
-                'is_special' => $session['is_special'],
-            ]);
+        // Definir las fechas de prueba (una fecha por cada película)
+        $dates = [];
+        for ($i = 0; $i < $movies->count(); $i++) { // Usar el número de películas
+            $dates[] = Carbon::today()->addDays($i)->toDateString();
         }
+
+        // Horarios disponibles
+        $times = ['16:00', '18:00', '20:00'];
+
+        // Crear sesiones para cada fecha y horario
+        foreach ($dates as $index => $date) {
+            // Seleccionar una película diferente para cada fecha
+            $movie = $movies[$index % $movies->count()]; // Usar módulo para evitar desbordamiento
+
+            foreach ($times as $time) {
+                SessionMovie::create([
+                    'movie_id' => $movie->id, // ID de la película actual
+                    'date' => $date,
+                    'time' => $time,
+                    'is_special' => false, // Por defecto, no es una sesión especial
+                ]);
+            }
+        }
+
+        // Mensaje de confirmación
+        $this->command->info('Sesiones de prueba creadas correctamente.');
     }
 }
