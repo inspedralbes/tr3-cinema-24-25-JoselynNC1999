@@ -7,13 +7,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-
 class UserController extends Controller
 {
     // Listar todos los usuarios
     public function index()
     {
-        return response()->json(User::all());
+        $users = User::all();
+        return view('users', compact('users'));
     }
 
     // Crear un nuevo usuario
@@ -28,17 +28,24 @@ class UserController extends Controller
 
         $data['password'] = Hash::make($data['password']);
 
-        $user = User::create($data);
+        User::create($data);
 
-        return response()->json($user, 201);
+        return redirect()->route('users.index')->with('success', 'Usuario creado exitosamente');
     }
 
     // Mostrar un usuario en específico
     public function show(User $user)
     {
-        return response()->json($user);
+        return view('users', compact('user'));
     }
 
+    public function edit(User $user)
+{
+    return view('users', [
+        'user' => $user,
+        'editing' => true, // Activa el modo de edición
+    ]);
+}
     // Actualizar un usuario
     public function update(Request $request, User $user)
     {
@@ -55,13 +62,13 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return response()->json($user);
+        return redirect()->route('users')->with('success', 'Usuario actualizado exitosamente');
     }
 
     // Eliminar un usuario
     public function destroy(User $user)
     {
         $user->delete();
-        return response()->json(null, 204);
+        return redirect()->route('users.index')->with('success', 'Usuari esborrat exitosament');
     }
 }
