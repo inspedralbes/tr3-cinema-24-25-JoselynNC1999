@@ -11,15 +11,16 @@ class SessionMovieController extends Controller
 {
     // Listar todas las sesiones (para web y API)
     public function index()
-    {
-        $sessions = SessionMovie::with('movie')->get();
+{
+    // Obtener las sesiones de los próximos 12 días con horario de 16:00
+    $sessions = SessionMovie::with('movie')
+        ->where('date', '>=', now()->toDateString())
+        ->where('date', '<=', now()->addDays(12)->toDateString())
+        ->where('time', '16:00') // Filtrar por horario de 16:00
+        ->get();
 
-        if (request()->wantsJson()) {
-            return response()->json($sessions);
-        }
-
-        return view('sessions', compact('sessions'));
-    }
+    return response()->json($sessions);
+}
 
     // Mostrar una sesión específica
     public function show(SessionMovie $sessionMovie)

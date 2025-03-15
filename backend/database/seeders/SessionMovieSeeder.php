@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\SessionMovie;
-use App\Models\Movie; // Importar el modelo Movie
+use App\Models\Movie;
 use Carbon\Carbon;
 
 class SessionMovieSeeder extends Seeder
@@ -29,22 +29,20 @@ class SessionMovieSeeder extends Seeder
             $dates[] = Carbon::today()->addDays($i)->toDateString();
         }
 
-        // Horarios disponibles
-        $times = ['16:00', '18:00', '20:00'];
+        // Horario único: 16:00
+        $time = '16:00';
 
-        // Crear sesiones para cada fecha y horario
+        // Crear sesiones para cada fecha
         foreach ($dates as $index => $date) {
             // Seleccionar una película diferente para cada fecha
             $movie = $movies[$index % $movies->count()]; // Usar módulo para evitar desbordamiento
 
-            foreach ($times as $time) {
-                SessionMovie::create([
-                    'movie_id' => $movie->id, // ID de la película actual
-                    'date' => $date,
-                    'time' => $time,
-                    'is_special' => false, // Por defecto, no es una sesión especial
-                ]);
-            }
+            SessionMovie::create([
+                'movie_id' => $movie->id, // ID de la película actual
+                'date' => $date,
+                'time' => $time,
+                'is_special' => false, // Por defecto, no es una sesión especial
+            ]);
         }
 
         // Mensaje de confirmación
