@@ -42,7 +42,11 @@
             class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition transform hover:scale-105 text-white font-semibold"
             @click="buyTicket(movie)"
           >
-            Comprar entrades
+          
+          <NuxtLink :to="`/movies/${movie.id}`" class="block w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105 text-center text-white font-semibold">
+  Comprar entrades
+</NuxtLink>
+
           </button>
         </div>
       </div>
