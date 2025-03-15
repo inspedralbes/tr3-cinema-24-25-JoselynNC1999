@@ -1,38 +1,54 @@
 <template>
-    <section class="py-6 bg-blue-950/80">
-      <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div class="flex items-center gap-4 w-full md:w-auto">
-            <span class="text-blue-300 font-semibold">Filtrar per:</span>
-            <select class="bg-blue-900 border border-blue-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-              <option value="tots">Totes les pel·lícules</option>
-              <option value="estrenes">Estrenes</option>
-              <option value="vip">Sales VIP</option>
-              <option value="3d">Pel·lícules 3D</option>
-              <option value="vo">V.O. Subtitulada</option>
-            </select>
-          </div>
-          <div class="flex items-center gap-4 w-full md:w-auto">
-            <span class="text-blue-300 font-semibold">Gènere:</span>
-            <select class="bg-blue-900 border border-blue-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-              <option value="tots">Tots els gèneres</option>
-              <option value="accio">Acció</option>
-              <option value="aventura">Aventura</option>
-              <option value="ciencia-ficcio">Ciència Ficció</option>
-              <option value="comedia">Comèdia</option>
-              <option value="drama">Drama</option>
-              <option value="terror">Terror</option>
-              <option value="animacio">Animació</option>
-            </select>
-          </div>
-          <div class="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
-            <input
-              type="text"
-              placeholder="Cerca pel·lícules..."
-              class="bg-blue-900 border border-blue-700 text-white rounded-full px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-          </div>
+  <section class="pb-8 pt-4 bg-blue-950/80">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-2">
+          <button 
+            v-for="(date, index) in dates" 
+            :key="index"
+            :class="[
+              'px-4 py-2 rounded-full text-sm font-medium transition',
+              selectedDate === index 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-blue-900/60 text-blue-300 hover:bg-blue-800'
+            ]"
+            @click="selectedDate = index"
+          >
+            {{ date }}
+          </button>
+        </div>
+        <div class="flex gap-2">
+          <select 
+            v-model="selectedGenre"
+            class="bg-blue-900/60 text-blue-300 px-4 py-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">Tots els gèneres</option>
+            <option v-for="genre in genres" :key="genre.value" :value="genre.value">
+              {{ genre.label }}
+            </option>
+          </select>
         </div>
       </div>
-    </section>
-  </template>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const selectedDate = ref(0);
+const selectedGenre = ref('');
+
+const dates = [
+  'Avui',
+  'Demà',
+  'dium., 17',
+  'dill., 18',
+  'Totes les dates'
+];
+
+const genres = [
+  { value: 'action', label: 'Acció' },
+  { value: 'comedy', label: 'Comèdia' },
+  { value: 'drama', label: 'Drama' },
+  { value: 'scifi', label: 'Ciència ficció' }
+];
+</script>

@@ -60,6 +60,23 @@ class SessionMovieController extends Controller
 
         return redirect()->route('sessions.index')->with('success', 'Sessions creades correctament.');
     }
+    public function getSessionsByMovie($movie_id)
+{
+    // Verificar si la película existe
+    $movie = Movie::find($movie_id);
+    if (!$movie) {
+        return response()->json(['message' => 'Película no encontrada'], 404);
+    }
+
+    // Obtener las sesiones de esa película
+    $sessions = SessionMovie::where('movie_id', $movie_id)->with('movie')->get();
+
+    return response()->json([
+        'movie' => $movie,
+        'sessions' => $sessions
+    ]);
+}
+
 
     // Actualizar una sesión
     public function update(Request $request, SessionMovie $sessionMovie)
