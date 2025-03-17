@@ -54,7 +54,7 @@
               :disabled="selectedSeats.length === 0"
               @click="confirmPurchase"
             >
-              Confirmar Compra
+              Confirmar Compraaaaa
             </button>
           </div>
         </div>

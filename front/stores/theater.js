@@ -47,10 +47,10 @@ export const useTheaterStore = defineStore('theater', {
     isVipSeat: (state) => (row) => row === state.vipRow,
 
     getSeatClass: (state) => (row, seat) => {
-      if (state.isSeatOccupied(row, seat)) return 'bg-gray-500';
-      if (state.isSeatSelected(row, seat)) return 'bg-yellow-400';
-      if (state.isVipSeat(row)) return 'bg-purple-500';
-      return 'bg-blue-400';
+      if (state.isSeatOccupied(row, seat)) return 'bg-red-500'; // Ocupada (Rojo)
+      if (state.isSeatSelected(row, seat)) return 'bg-green-500'; // Seleccionada (Verde)
+      if (state.isVipSeat(row)) return 'bg-purple-500'; // VIP (Morado)
+      return 'bg-gray-500'; // Disponible (Gris)
     }
   },
 
