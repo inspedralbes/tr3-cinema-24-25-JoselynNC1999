@@ -34,4 +34,9 @@ class SessionMovie extends Model
     {
         return $this->hasMany(Ticket::class, 'session_id');
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }

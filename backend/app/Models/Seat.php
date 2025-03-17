@@ -25,4 +25,9 @@ class Seat extends Model
     {
         return $this->hasOne(Ticket::class, 'seat_id');
     }
+
+    public function reservations()
+    {
+        return $this->belongsToMany(Reservation::class, 'reservation_seat');
+    }
 }
