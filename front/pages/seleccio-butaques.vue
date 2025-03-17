@@ -1,4 +1,7 @@
 <template>
+    <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
+    <TheHeader />
+    
   <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
     <section class="py-8 px-6 relative overflow-hidden">
       <div class="container mx-auto relative z-10">
@@ -79,6 +82,10 @@
       </div>
     </section>
   </div>
+  <PromoSection class="my-12" />
+    <NewsletterSection class="mt-16" />
+    <TheFooter />
+</div>
 </template>
 
 <script setup>
@@ -88,6 +95,10 @@ import MovieCard from '@/components/cinema/MovieCard.vue';
 import SessionInfo from '@/components/cinema/SessionInfo.vue';
 import SeatLegend from '@/components/cinema/SeatLegend.vue';
 import PantallaTeatro from '@/components/cinema/PantallaTeatro.vue';
+import TheHeader from '@/components/layout/TheHeader.vue';
+import PromoSection from '@/components/layout/PromoSection.vue';
+import NewsletterSection from '@/components/sections/NewsletterSection.vue';
+import TheFooter from '@/components/layout/TheFooter.vue';
 import TicketSummary from '@/components/cinema/TicketSummary.vue';
 
 const theaterStore = useTheaterStore();

@@ -148,7 +148,6 @@ const confirmPurchase = () => {
     <span class="mx-2">/</span>
     <a href="#" class="hover:text-white transition-colors">Cartellera</a>
     <span class="mx-2">/</span>
-    <a href="#" class="hover:text-white transition-colors">Aventures Galàctiques</a>
     <span class="mx-2">/</span>
     <span class="text-white">Selecció de butaques</span>
   </div>
@@ -164,7 +163,6 @@ const confirmPurchase = () => {
       <div class="absolute top-2 right-2 bg-blue-600 text-xs px-2 py-1 rounded">ESTRENA</div>
     </div>
     <div class="p-4">
-      <h3 class="font-bold text-lg mb-2">Aventures Galàctiques</h3>
       <div class="flex mb-2">
         <div class="text-yellow-400 flex">
           <span>★</span><span>★</span><span>★</span><span>★</span><span class="text-blue-700">★</span>

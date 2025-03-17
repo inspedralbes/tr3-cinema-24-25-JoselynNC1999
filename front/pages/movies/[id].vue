@@ -44,10 +44,18 @@
           </div>
 
           <!-- Botón de compra -->
-          <button class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105"
-                  @click="buyTicket">
-            Comprar entrades
-          </button>
+          <NuxtLink 
+          :to="{
+            path: '/seleccio-butaques',
+            query: { id: movie.id, title: movie.title, poster: movie.poster_url }
+          }"
+          class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105 text-center block py-2"
+          @click="buyTicket"
+        >
+          Comprar entrades
+        </NuxtLink>
+
+
         </div>
       </div>
 
