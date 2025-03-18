@@ -3,11 +3,11 @@ import { useCookie } from '#app';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: useCookie('token'), // Guardamos el token en una cookie
-    user: null, // Usuario autenticado
-    selectedMovie: null, // Película seleccionada
-    selectedSession: null, // Sesión elegida
-    selectedSeats: [] // Lista de asientos seleccionados
+    token: useCookie('token'),
+    user: null,
+    selectedMovie: null,
+    selectedSession: null,
+    selectedSeats: []
   }),
 
   actions: {
@@ -31,14 +31,19 @@ export const useAuthStore = defineStore('auth', {
           method: 'POST',
           body: credentials
         });
-        console.log('Usuario autenticado:', this.user);
-        console.log('Token guardado:', this.token);
 
         this.token = response.token;
         this.user = response.user;
-        console.log('Usuario autenticado:', this.user);
+        console.log("Token guardado:", this.token);
+        console.log("Usuario autenticado:", JSON.parse(JSON.stringify(this.user)));
+        // 🔥 Recuperar la película, sesión y asientos si ya fueron seleccionados antes de hacer login
+    const theaterStore = useTheaterStore();
+    if (theaterStore.selectedMovie) this.selectedMovie = theaterStore.selectedMovie;
+    if (theaterStore.selectedSession) this.selectedSession = theaterStore.selectedSession;
+    if (theaterStore.selectedSeats.length > 0) this.selectedSeats = [...theaterStore.selectedSeats];
+
       } catch (error) {
-        console.error(error);
+        console.error("Error en el login", error);
         throw error;
       }
     },
@@ -49,6 +54,7 @@ export const useAuthStore = defineStore('auth', {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` }
         });
+
         this.token = null;
         this.user = null;
         this.selectedMovie = null;
@@ -59,22 +65,55 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Nueva función para guardar la selección de la película
     selectMovie(movie) {
       this.selectedMovie = movie;
-      console.log('Película seleccionada:', this.selectedMovie);
+      const theaterStore = useTheaterStore();
+      theaterStore.currentMovie = movie; // Sincronizar con theaterStore
     },
 
-    // Nueva función para guardar la sesión elegida
     selectSession(session) {
       this.selectedSession = session;
-      console.log('Sesión seleccionada:', this.selectedSession);
+      const theaterStore = useTheaterStore();
+      theaterStore.currentSession = session; // Sincronizar con theaterStore
     },
-
-    // Nueva función para guardar los asientos seleccionados
+    
     selectSeats(seats) {
       this.selectedSeats = seats;
-      console.log('Asientos seleccionados:', this.selectedSeats);
+      const theaterStore = useTheaterStore();
+      theaterStore.selectedSeats = seats; // Sincronizar con theaterStore
+    },
+
+    async purchaseTickets() {
+      if (!this.user) {
+        alert('Debes iniciar sesión para comprar entradas.');
+        return;
+      }
+
+      if (!this.selectedMovie || !this.selectedSession || this.selectedSeats.length === 0) {
+        alert('Selecciona una película, una sesión y al menos un asiento.');
+        return;
+      }
+
+      try {
+        const response = await $fetch('http://127.0.0.1:8000/api/purchase', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${this.token}` },
+          body: {
+            user_id: this.user.id,
+            movie_id: this.selectedMovie.id,
+            session_id: this.selectedSession.id,
+            seats: this.selectedSeats
+          }
+        });
+
+        alert('Compra realizada con éxito');
+        this.selectedMovie = null;
+        this.selectedSession = null;
+        this.selectedSeats = [];
+      } catch (error) {
+        console.error('Error en la compra', error);
+        alert('Hubo un problema con la compra.');
+      }
     }
   }
 });

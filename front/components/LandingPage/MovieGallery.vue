@@ -30,19 +30,28 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useMovieStore } from '@/stores/movies'
 import MovieCard from '@/components/LandingPage/MovieCard'
 
 const movieStore = useMovieStore()
 
-// Computed per obtenir les primeres 4 pel·lícules de la cartellera
+// Computed para obtener las primeras 4 películas de la cartelera
 const topMovies = computed(() => movieStore.regularMovies.slice(0, 4))
 
-onMounted(() => {
-  if (movieStore.regularMovies.length === 0) {
-    movieStore.fetchMovies() // Carregar pel·lícules si no estan ja al store
+onMounted(async () => {
+  try {
+    if (movieStore.regularMovies.length === 0) {
+      await movieStore.fetchMovies() // Asegurar que las películas se cargan correctamente
+    }
+  } catch (error) {
+    console.error("Error al cargar las películas:", error)
   }
+})
+
+// Opcional: Si fetchMovies() es reactivo, podemos usar watch para asegurarnos de que topMovies se actualiza correctamente.
+watch(() => movieStore.regularMovies, () => {
+  console.log("Películas actualizadas:", movieStore.regularMovies)
 })
 
 defineProps({

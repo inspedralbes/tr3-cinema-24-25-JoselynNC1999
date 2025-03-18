@@ -22,6 +22,10 @@ Route::apiResource('seats', SeatController::class);
 Route::apiResource('tickets', TicketController::class);
 Route::apiResource('users', UserController::class);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('tickets', TicketController::class);
+});
+
 // Ruta para obtener las sesiones de una película específica
 Route::get('/movies/{movie_id}/sessions', [SessionMovieController::class, 'getSessionsByMovie']);
 

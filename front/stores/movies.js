@@ -1,23 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-interface Movie {
-  id: number
-  title: string
-  description: string
-  poster_url: string
-  duration: number
-  badge?: string
-}
-
 export const useMovieStore = defineStore('movies', () => {
-  const movies = ref<Movie[]>([])
-  const featuredMovies = ref<Movie[]>([])
-  const regularMovies = ref<Movie[]>([])
+  const movies = ref([])
+  const featuredMovies = ref([])
+  const regularMovies = ref([])
   const totalPages = ref(1)
   const currentPage = ref(1)
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const error = ref(null)
 
   const fetchMovies = async (page = 1) => {
     try {
@@ -34,13 +25,13 @@ export const useMovieStore = defineStore('movies', () => {
       if (!response.ok) throw new Error("Error loading movies")
       const data = await response.json()
 
-      movies.value = data.map((movie: Movie) => ({
+      movies.value = data.map(movie => ({
         ...movie,
-        poster_url: movie.poster_url || 'https://via.placeholder.com/300x450?text=No+Image' // Imagen de respaldo
+        poster_url: movie.poster_url || 'https://via.placeholder.com/300x450?text=No+Image'
       }))
 
-      featuredMovies.value = movies.value.filter((movie) => movie.badge === 'ESTRENA')
-      regularMovies.value = movies.value.filter((movie) => !movie.badge || movie.badge !== 'ESTRENA')
+      featuredMovies.value = movies.value.filter(movie => movie.badge === 'ESTRENA')
+      regularMovies.value = movies.value.filter(movie => !movie.badge || movie.badge !== 'ESTRENA')
 
       if (data.meta) {
         totalPages.value = data.meta.last_page

@@ -66,12 +66,12 @@
               <!-- Confirmación -->
               <div class="mt-8 text-center">
                 <button 
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50"
-                  :disabled="theaterStore.selectedSeats.length === 0"
-                  @click="theaterStore.confirmPurchase()"
-                >
-                  Confirmar Compra
-                </button>
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50"
+                :disabled="theaterStore.selectedSeats.length === 0"
+                @click="theaterStore.confirmPurchase()"
+              >
+                Confirmar Compra
+              </button>
               </div>
               
               <!-- Info adicional -->
@@ -105,6 +105,18 @@
   import NewsletterSection from '@/components/sections/NewsletterSection.vue';
   import TheFooter from '@/components/layout/TheFooter.vue';
   import TicketSummary from '@/components/cinema/TicketSummary.vue';
+
+  import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+onMounted(() => {
+  if (!authStore.user) {
+    router.push('/login');
+  }
+});
   
   const theaterStore = useTheaterStore();
   const route = useRoute();

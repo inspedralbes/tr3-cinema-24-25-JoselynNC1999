@@ -16,24 +16,25 @@ const loginError = ref('');
 // Escuchar cambios en el usuario logueado y mostrarlo en consola
 watch(() => authStore.user, (newUser) => {
   if (newUser) {
-    console.log('Usuario logueado:', newUser);
+    console.log('🟢 Usuario logueado (watch en Login.vue):', JSON.parse(JSON.stringify(newUser)));
   }
-});
+}, { immediate: true }); // Esto hará que el watch se ejecute de inmediato si ya hay un usuario
+
 
 const handleLogin = async () => {
   try {
     loginError.value = '';
-    await authStore.login(credentials); // Llamar al método de autenticación de Pinia
+    await authStore.login(credentials); // Espera que termine el login
 
-    console.log('Usuario autenticado:', authStore.user); // Ver usuario en consola
+    console.log('✅ Usuario autenticado (handleLogin en Login.vue):', JSON.parse(JSON.stringify(authStore.user)));
 
-    // Redirigir al landing page (index.vue)
-    router.push('/');
+    router.push('/'); // Redirige después del login exitoso
   } catch (error) {
     console.error('Error en el login', error);
     loginError.value = 'Error al iniciar sesión. Verifica tus credenciales.';
   }
 };
+
 
 const showRegister = () => {
   router.push('/register'); // Redirige a la página de registro

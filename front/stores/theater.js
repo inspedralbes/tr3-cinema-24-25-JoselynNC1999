@@ -1,5 +1,6 @@
-// stores/theater.js
 import { defineStore } from 'pinia';
+import { useAuthStore } from './auth';
+
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -95,38 +96,52 @@ export const useTheaterStore = defineStore('theater', {
     },
 
     toggleSeat(row, seat) {
+      const authStore = useAuthStore();
+      
+      if (!authStore.user) {
+        alert("Debes iniciar sesión para seleccionar asientos.");
+        return;
+      }
+
       if (this.isSeatOccupied(row, seat)) return;
 
       const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat === seat);
-
       if (seatIndex !== -1) {
         this.selectedSeats.splice(seatIndex, 1);
       } else {
         if (this.selectedSeats.length >= 10) {
-          alert('No puedes seleccionar más de 10 butacas por sesión');
+          alert('No puedes seleccionar más de 10 butacas.');
           return;
         }
         this.selectedSeats.push({ row, seat });
       }
-    },
 
+    },
     toggleDiscountDay() {
       this.isDiscountDay = !this.isDiscountDay;
     },
-
     confirmPurchase() {
-      if (this.selectedSeats.length === 0) {
-        alert('Debes seleccionar al menos una butaca');
+      const authStore = useAuthStore();
+    
+      if (!authStore.selectedMovie || !authStore.selectedSession || authStore.selectedSeats.length === 0) {
+        alert("Selecciona una película, una sesión y al menos un asiento.");
         return;
       }
-
-      const seatCount = this.selectedSeats.length;
+    
+      // Calculamos precio
+      const seatCount = authStore.selectedSeats.length;
       const total = this.totalPrice;
-
+    
       alert(`Compra confirmada: ${seatCount} butacas por ${total}€`);
-
-      this.occupiedSeats = [...this.occupiedSeats, ...this.selectedSeats];
+    
+      // Guardamos los asientos como ocupados
+      this.occupiedSeats = [...this.occupiedSeats, ...authStore.selectedSeats];
+    
+      // Reset de asientos seleccionados
+      authStore.selectedSeats = [];
       this.selectedSeats = [];
     }
-  }
+    }
+       
+     
 });
