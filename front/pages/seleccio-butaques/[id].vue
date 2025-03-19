@@ -10,9 +10,7 @@
 
           <!-- Movie Info -->
           <div class="md:flex items-start mb-8">
-            <div class="w-full md:w-1/4 mb-6 md:mb-0">
-              <MovieGrid :movie="theaterStore.currentMovie" v-if="theaterStore.currentMovie" />
-            </div>
+            
             <div class="w-full md:w-3/4 md:pl-8">
               <SessionInfo 
                 v-if="theaterStore.currentSession"
@@ -97,7 +95,6 @@ import { useRoute } from 'vue-router';
 import { useTheaterStore } from '@/stores/theater';
 
 import BreadcrumbNavigation from '@/components/cinema/BreadcrumbNavigation.vue';
-import MovieGrid from '@/components/sections/MovieGrid.vue';
 import SessionInfo from '@/components/cinema/SessionInfo.vue';
 import SeatLegend from '@/components/cinema/SeatLegend.vue';
 import PantallaTeatro from '@/components/cinema/PantallaTeatro.vue';

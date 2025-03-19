@@ -10,7 +10,7 @@
           <span class="ml-2 font-semibold">{{ session.time }}</span>
         </div>
         <div class="bg-blue-900/60 px-4 py-2 rounded-full">
-          <span class="text-blue-300 text-sm">Sala:</span>
+          <span class="text-blue-300 text-sm">Sala:1</span>
           <span class="ml-2 font-semibold">{{ session.room }}</span>
         </div>
         <div 

@@ -90,6 +90,23 @@ export const useTheaterStore = defineStore('theater', {
         console.error('Error en fetchSessionByMovieId:', error);
       }
     },
+
+    async fetchMovieDetails(movieId) {
+      try {
+        console.log(`Fetching movie details for movie ID: ${movieId}`);
+        const response = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}`);
+        
+        if (!response.ok) throw new Error('Error al obtener la película');
+        
+        const movie = await response.json();
+        console.log('Movie details fetched:', movie);
+        
+        this.movieDetails = movie; // Guarda los detalles de la película en una propiedad de tu estado
+      } catch (error) {
+        console.error('Error en fetchMovieDetails:', error);
+      }
+    },
+    
     
 
     async fetchOccupiedSeats(sessionId) {

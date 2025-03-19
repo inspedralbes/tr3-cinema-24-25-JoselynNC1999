@@ -17,7 +17,6 @@
           <span class="text-white">Confirmació de Compra</span>
         </div>
         
-        <!-- Purchase Confirmation -->
         <div class="max-w-4xl mx-auto">
           <div class="bg-blue-950/70 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-sm">
             <!-- Header with success message -->
@@ -34,6 +33,7 @@
                 </div>
               </div>
             </div>
+            
             
             <!-- Purchase details -->
             <div class="p-6 md:p-8">
@@ -224,6 +224,7 @@ const formatPrice = (price) => {
 onMounted(async () => {
   if (movieId.value) {
     await theaterStore.loadMovieAndSession(movieId.value);
+    await theaterStore.fetchMovieDetails(movieId.value);  // Aquí haces la llamada para obtener los detalles
   }
 });
 </script>
