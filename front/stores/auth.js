@@ -1,21 +1,29 @@
 import { defineStore } from 'pinia';
 import { useCookie } from '#app';
+import { useTheaterStore } from './theater';  // Asegúrate de importar el store de theater
+
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: useCookie('token'),
+    token: useCookie('token'), // Guardar el token en la cookie
     user: null,
     selectedMovie: null,
     selectedSession: null,
-    selectedSeats: []
+    selectedSeats: [],
   }),
 
+  getters: {
+    // Verificar si el usuario está autenticado comprobando la existencia del token
+    isAuthenticated: (state) => !!state.token,
+  },
+
   actions: {
+    // Registro de usuario
     async register(user) {
       try {
         const response = await $fetch('http://127.0.0.1:8000/api/register', {
           method: 'POST',
-          body: user
+          body: user,
         });
         this.token = response.token;
         this.user = response.user;
@@ -25,22 +33,24 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Login de usuario
     async login(credentials) {
       try {
         const response = await $fetch('http://127.0.0.1:8000/api/login', {
           method: 'POST',
-          body: credentials
+          body: credentials,
         });
 
         this.token = response.token;
         this.user = response.user;
         console.log("Token guardado:", this.token);
         console.log("Usuario autenticado:", JSON.parse(JSON.stringify(this.user)));
-        // 🔥 Recuperar la película, sesión y asientos si ya fueron seleccionados antes de hacer login
-    const theaterStore = useTheaterStore();
-    if (theaterStore.selectedMovie) this.selectedMovie = theaterStore.selectedMovie;
-    if (theaterStore.selectedSession) this.selectedSession = theaterStore.selectedSession;
-    if (theaterStore.selectedSeats.length > 0) this.selectedSeats = [...theaterStore.selectedSeats];
+
+        // Sincronizar con theaterStore los valores anteriores de la película, sesión y asientos
+        const theaterStore = useTheaterStore();
+        if (theaterStore.selectedMovie) this.selectedMovie = theaterStore.selectedMovie;
+        if (theaterStore.selectedSession) this.selectedSession = theaterStore.selectedSession;
+        if (theaterStore.selectedSeats.length > 0) this.selectedSeats = [...theaterStore.selectedSeats];
 
       } catch (error) {
         console.error("Error en el login", error);
@@ -48,11 +58,12 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Logout de usuario
     async logout() {
       try {
         await $fetch('http://127.0.0.1:8000/api/logout', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${this.token}` }
+          headers: { Authorization: `Bearer ${this.token}` },
         });
 
         this.token = null;
@@ -65,24 +76,31 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Selección de película
     selectMovie(movie) {
-      this.selectedMovie = movie;
+      console.log('Película seleccionada:', movie);
+      this.selectedMovie = movie;  // Solo modificar el valor en el store de auth
+      console.log('Película guardada en selectedMovie:', this.selectedMovie);  // Verificar que la película se guardó correctamente
+
+      // Sincronizar la película seleccionada con el store de theater
       const theaterStore = useTheaterStore();
-      theaterStore.currentMovie = movie; // Sincronizar con theaterStore
+      theaterStore.currentMovie = movie;  // Asegúrate de sincronizarlo con el store de theater
     },
 
     selectSession(session) {
       this.selectedSession = session;
       const theaterStore = useTheaterStore();
-      theaterStore.currentSession = session; // Sincronizar con theaterStore
+      theaterStore.currentSession = session;  // Sincronizar con theaterStore
     },
-    
+
     selectSeats(seats) {
       this.selectedSeats = seats;
       const theaterStore = useTheaterStore();
-      theaterStore.selectedSeats = seats; // Sincronizar con theaterStore
+      theaterStore.selectedSeats = seats;  // Sincronizar con theaterStore
     },
 
+
+    // Realizar compra de entradas
     async purchaseTickets() {
       if (!this.user) {
         alert('Debes iniciar sesión para comprar entradas.');
@@ -102,8 +120,8 @@ export const useAuthStore = defineStore('auth', {
             user_id: this.user.id,
             movie_id: this.selectedMovie.id,
             session_id: this.selectedSession.id,
-            seats: this.selectedSeats
-          }
+            seats: this.selectedSeats,
+          },
         });
 
         alert('Compra realizada con éxito');
@@ -114,6 +132,6 @@ export const useAuthStore = defineStore('auth', {
         console.error('Error en la compra', error);
         alert('Hubo un problema con la compra.');
       }
-    }
-  }
+    },
+  },
 });

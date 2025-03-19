@@ -3,10 +3,10 @@
     <TheHeader />
 
     <div class="container mx-auto px-4 py-8">
-      <Breadcrumb v-if="movie" :items="[
-        { name: 'Inici', path: '/' },
-        { name: 'Películas', path: '/movies' },
-        { name: movie.title, path: '#', current: true }
+      <Breadcrumb v-if="movie" :items="[ 
+        { name: 'Inici', path: '/' }, 
+        { name: 'Películas', path: '/movies' }, 
+        { name: movie.title, path: '#', current: true } 
       ]" />
 
       <!-- Cargando o error -->
@@ -30,11 +30,11 @@
           <p class="text-blue-200 mb-2"><strong>Clasificación:</strong> {{ movie.ageRating || 'No disponible' }}</p>
           <p class="text-blue-200 mb-4"><strong>Descripción:</strong> {{ movie.description }}</p>
 
-          <!-- Mostrar sesiones -->
-          <div v-if="movie.sessions && movie.sessions.length" class="mb-4">
+          <!-- Mostrar sesiones obtenidas desde Pinia -->
+          <div v-if="sessions.length" class="mb-4">
             <span class="text-blue-300 text-sm font-medium">Sesiones:</span>
             <ul class="text-blue-200 text-sm">
-              <li v-for="(session, index) in movie.sessions" :key="index">
+              <li v-for="(session, index) in sessions" :key="index">
                 🕒 {{ session.date }} - {{ session.time }}
               </li>
             </ul>
@@ -43,19 +43,22 @@
             No hay sesiones disponibles para esta película.
           </div>
 
-          <!-- Botón de compra -->
+          <!-- Botón de compra (verifica autenticación) -->
           <NuxtLink 
-          :to="{
-            path: '/seleccio-butaques',
-            query: { id: movie.id, title: movie.title, poster: movie.poster_url }
-          }"
-          class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105 text-center block py-2"
-          @click="buyTicket"
-        >
-          Comprar entrades
-        </NuxtLink>
+            v-if="isAuthenticated"
+            :to="{
+              path: '/seleccio-butaques',
+              query: { id: movie.id, title: movie.title, poster: movie.poster_url }
+            }"
+            class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105 text-center block py-2"
+            @click="buyTicket"
+          >
+            Comprar entrades
+          </NuxtLink>
 
-
+          <p v-else class="text-center text-red-500 mt-3">
+            Debes iniciar sesión para comprar entradas.
+          </p>
         </div>
       </div>
 
@@ -72,64 +75,69 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import TheHeader from '@/components/layout/TheHeader.vue';
-import Breadcrumb from '@/components/layout/Breadcrumb.vue';
-import PromoSection from '@/components/layout/PromoSection.vue';
-import NewsletterSection from '@/components/sections/NewsletterSection.vue';
-import TheFooter from '@/components/layout/TheFooter.vue';
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useSessionStore } from '@/stores/sessions'
+import { useAuthStore } from '@/stores/auth'
+import { useMovieStore } from '@/stores/movies'
+import TheHeader from '@/components/layout/TheHeader.vue'
+import Breadcrumb from '@/components/layout/Breadcrumb.vue'
+import PromoSection from '@/components/layout/PromoSection.vue'
+import NewsletterSection from '@/components/sections/NewsletterSection.vue'
+import TheFooter from '@/components/layout/TheFooter.vue'
 
-const route = useRoute();
-const movie = ref(null);
-const loading = ref(false);
-const error = ref(null);
+const route = useRoute()
+const movie = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+const sessionStore = useSessionStore()
+const authStore = useAuthStore()
+const movieStore = useMovieStore()
 
 const fetchMovie = async () => {
   try {
-    loading.value = true;
-    error.value = null;
+    loading.value = true
+    error.value = null
 
-    const movieId = route.params.id;
-    console.log(`📌 Obteniendo película con ID: ${movieId}`);
+    const movieId = route.params.id
+    console.log(`📌 Obteniendo película con ID: ${movieId}`)
 
-    // Petición para obtener la película
-    const response = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    });
+    // Obtener película desde el store
+    movie.value = movieStore.getMovieById(movieId)
 
-    if (!response.ok) {
-      console.error(`❌ Error: Código de respuesta ${response.status}`);
-      throw new Error(`Error al cargar la película (Código: ${response.status})`);
+    if (!movie.value) {
+      throw new Error('Película no encontrada en el store.')
     }
 
-    const data = await response.json();
+    // Seleccionar la película en el store de auth
+    authStore.selectMovie(movie.value)  // Aquí se guarda la película seleccionada
 
-    // Petición para obtener las sesiones
-    const sessionResponse = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}/sessions`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    });
-
-    let sessions = [];
-    if (sessionResponse.ok) {
-      const sessionsData = await sessionResponse.json();
-      sessions = sessionsData.sessions || [];
-    }
-
-    movie.value = { ...data, sessions };
+    // Cargar sesiones desde el store
+    sessionStore.fetchSessions(movieId)
   } catch (err) {
-    error.value = 'No se pudo cargar la película. Inténtalo más tarde.';
-    console.error('❌ Error:', err);
+    error.value = 'No se pudo cargar la película. Inténtalo más tarde.'
+    console.error('❌ Error:', err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
+
+
+// Crear un `computed()` para obtener las sesiones filtradas
+const sessions = computed(() => {
+  return sessionStore.sessions.filter(session => session.movie_id === movie.value?.id)
+})
+
+// Verificar si el usuario está autenticado
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const buyTicket = () => {
-  console.log(`🎟️ Comprando entrada para ${movie.value.title}`);
-};
+  console.log(`🎟️ Comprando entrada para ${movie.value.title}`)
+}
 
-onMounted(fetchMovie);
+onMounted(async () => {
+  await fetchMovie();
+  console.log('Película después de obtenerla:', movie.value); // Verificar que la película está correctamente asignada
+});
 </script>

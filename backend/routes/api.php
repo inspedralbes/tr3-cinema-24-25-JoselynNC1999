@@ -9,6 +9,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservationController;
 
 
 
@@ -47,3 +48,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'index']); // Obtener reservas de un usuario
+    Route::post('/reservations', [ReservationController::class, 'store']); // Crear una reserva
+    Route::get('/reservations/{id}', [ReservationController::class, 'show']); // Ver una reserva específica
+    Route::put('/reservations/{id}', [ReservationController::class, 'update']); // Modificar estado de la reserva
+    Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']); // Cancelar una reserva
+});
+

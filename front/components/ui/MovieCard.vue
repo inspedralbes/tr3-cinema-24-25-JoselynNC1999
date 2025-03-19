@@ -3,18 +3,7 @@
     <div class="relative h-80 overflow-hidden">
       <img :src="poster_url" :alt="title" class="absolute inset-0 w-full h-full object-cover" />
 
-      <div class="absolute inset-0 bg-gradient-to-t from-blue-900 via-transparent to-transparent z-10"></div>
-
-      <div v-if="badge" class="absolute top-2 right-2 bg-red-600 text-xs px-2 py-1 rounded z-20">{{ badge }}</div>
-      <div v-if="badge3d" class="absolute top-2 right-2 bg-purple-600 text-xs px-2 py-1 rounded z-20">{{ badge3d }}</div>
-      <div v-if="badgeVip" class="absolute top-2 right-2 bg-yellow-600 text-xs px-2 py-1 rounded z-20">{{ badgeVip }}</div>
-
-      <div class="absolute bottom-0 left-0 w-full p-4 z-20">
-        <div class="flex gap-2 mb-2">
-          <span class="bg-blue-950/80 text-xs px-2 py-1 rounded backdrop-blur-sm">{{ ageRating }}</span>
-          <span v-if="isVOSE" class="bg-blue-950/80 text-xs px-2 py-1 rounded backdrop-blur-sm">VOSE</span>
-        </div>
-      </div>
+      <!-- Otros elementos -->
     </div>
 
     <div class="p-4">
@@ -27,22 +16,25 @@
       </div>
       <p class="text-blue-200 text-sm mb-2">{{ genre }} | {{ duration }} min</p>
       <p class="text-blue-300 text-sm mb-4 line-clamp-2">{{ description }}</p>
-      
+
       <div class="grid grid-cols-3 gap-2 mb-4">
         <div v-for="(time, index) in showtimes" :key="index" class="text-center py-1 px-2 bg-blue-800/50 rounded-md hover:bg-blue-700/50 cursor-pointer">
           {{ time }}
         </div>
       </div>
-      
-      <NuxtLink :to="`/movies/${id}`" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105">
-        Comprar entrades
-      </NuxtLink>
 
+      <!-- Button to navigate to selection page -->
+      <NuxtLink :to="`/movies/${id}`" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-full transition-transform hover:scale-105" @click="handleSelectMovie">
+        Comprar entradas
+      </NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useTheaterStore } from '@/stores/theater'; // Importar el store de teatro
+import { useRouter } from 'vue-router'; // Usar Vue Router para la navegación
+
 defineProps({
   title: String,
   description: String,
@@ -69,9 +61,31 @@ defineProps({
   },
   poster_url: String,
   id: {
-  type: Number,
-  required: true
+    type: Number,
+    required: true
   }
-
 });
+
+// Usar el store de teatro
+const theaterStore = useTheaterStore();
+const router = useRouter();
+
+// Función para manejar la selección de la película
+const handleSelectMovie = () => {
+  console.log("Película seleccionada:", id); // Asegurarte de que el ID esté llegando correctamente
+  theaterStore.currentMovie = {
+    id,
+    title,
+    description,
+    genre,
+    duration,
+    rating,
+    ageRating,
+    poster_url
+  };
+  console.log("Película guardada en el store:", theaterStore.currentMovie);
+
+  // Redirigir al usuario a la página de selección de asientos
+  router.push(`/movies/${id}`);
+};
 </script>

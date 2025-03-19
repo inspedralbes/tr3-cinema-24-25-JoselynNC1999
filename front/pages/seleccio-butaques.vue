@@ -64,15 +64,16 @@
               </div>
               
               <!-- Confirmación -->
-              <div class="mt-8 text-center">
-                <button 
+            <div class="mt-8 text-center">
+              <button 
                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50"
                 :disabled="theaterStore.selectedSeats.length === 0"
-                @click="theaterStore.confirmPurchase()"
+                @click="theaterStore.confirmPurchase()"  
               >
                 Confirmar Compra
               </button>
-              </div>
+            </div>
+
               
               <!-- Info adicional -->
               <div class="mt-6 text-center text-blue-300 text-sm">
@@ -95,6 +96,7 @@
   import { useRoute } from 'vue-router';
   import { useTheaterStore } from '@/stores/theater';
   
+  
   import BreadcrumbNavigation from '@/components/cinema/BreadcrumbNavigation.vue';
   import MovieGrid from '@/components/sections/MovieGrid.vue';
   import SessionInfo from '@/components/cinema/SessionInfo.vue';
@@ -110,8 +112,19 @@
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const selectedMovie = computed(() => authStore.selectedMovie)
+
 const router = useRouter();
 
+const buyTicket = () => {
+  if (!selectedMovie.value) {
+    alert('No se ha seleccionado una película.')
+    return
+  }
+  
+  // Procede con la compra de la entrada, usando `selectedMovie`
+  console.log(`🎟️ Comprando entrada para ${selectedMovie.value.title}`)
+}
 onMounted(() => {
   if (!authStore.user) {
     router.push('/login');
@@ -123,15 +136,21 @@ onMounted(() => {
   
   // Obtener el ID de la película de la URL y cargar los datos al montar la página
   onMounted(() => {
-    const movieId = route.params.id;
-    if (movieId) {
-      theaterStore.loadMovieAndSession(movieId);
-    }
-  });
+  if (!theaterStore.currentMovie) {
+    console.log("No se ha seleccionado una película.");
+  } else {
+    console.log("Película seleccionada:", theaterStore.currentMovie);
+  }
+});
+
   
   // Función para remover un asiento desde el resumen
   const removeSeat = (seat) => {
-    theaterStore.toggleSeat(seat.row, seat.seat);
-  };
+  console.log("Asiento removido:", seat);
+  theaterStore.toggleSeat(seat.row, seat.seat);
+};
+
+
+
   </script>
   

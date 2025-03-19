@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './auth';
-
+import { useRouter } from 'vue-router';
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -61,8 +61,9 @@ export const useTheaterStore = defineStore('theater', {
         const response = await fetch(`/api/movies/${movieId}`);
         if (!response.ok) throw new Error('Error al obtener la película');
         this.currentMovie = await response.json();
+        console.log("Película cargada:", this.currentMovie);
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar la película:", error);
       }
     },
 
@@ -72,8 +73,9 @@ export const useTheaterStore = defineStore('theater', {
         if (!response.ok) throw new Error('Error al obtener la sesión');
         const sessions = await response.json();
         this.currentSession = sessions[0]; // Supongamos que solo hay una sesión activa
+        console.log("Sesión cargada:", this.currentSession);
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar la sesión:", error);
       }
     },
 
@@ -88,12 +90,19 @@ export const useTheaterStore = defineStore('theater', {
     },
 
     async loadMovieAndSession(movieId) {
+      console.log("Cargando película y sesión para el ID:", movieId);
+    
       await this.fetchMovieById(movieId);
+      console.log("Película cargada:", this.currentMovie);
+    
       await this.fetchSessionByMovieId(movieId);
+      console.log("Sesión cargada:", this.currentSession);
+    
       if (this.currentSession) {
         await this.fetchOccupiedSeats(this.currentSession.id);
       }
     },
+    
 
     toggleSeat(row, seat) {
       const authStore = useAuthStore();
@@ -102,9 +111,9 @@ export const useTheaterStore = defineStore('theater', {
         alert("Debes iniciar sesión para seleccionar asientos.");
         return;
       }
-
+    
       if (this.isSeatOccupied(row, seat)) return;
-
+    
       const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat === seat);
       if (seatIndex !== -1) {
         this.selectedSeats.splice(seatIndex, 1);
@@ -115,33 +124,72 @@ export const useTheaterStore = defineStore('theater', {
         }
         this.selectedSeats.push({ row, seat });
       }
-
+      console.log("Asientos seleccionados ahora:", this.selectedSeats);
     },
+    
     toggleDiscountDay() {
       this.isDiscountDay = !this.isDiscountDay;
     },
-    confirmPurchase() {
+
+    async confirmPurchase() {
       const authStore = useAuthStore();
+      
+      // Verifica si hay una película, sesión y asientos seleccionados
+      console.log('Película en theaterStore:', theaterStore.selectedMovie);
+      console.log('Sesión en theaterStore:', theaterStore.selectedSession);
+console.log('Asientos en theaterStore:', theaterStore.selectedSeats);
+
     
-      if (!authStore.selectedMovie || !authStore.selectedSession || authStore.selectedSeats.length === 0) {
+      if (!this.currentMovie || !this.currentSession || this.selectedSeats.length === 0) {
         alert("Selecciona una película, una sesión y al menos un asiento.");
         return;
       }
     
-      // Calculamos precio
-      const seatCount = authStore.selectedSeats.length;
+      // Calculamos el precio total
       const total = this.totalPrice;
+      console.log("Total calculado:", total);
     
-      alert(`Compra confirmada: ${seatCount} butacas por ${total}€`);
+      // Realiza la reserva
+      try {
+        const reservationData = {
+          user_id: authStore.user.id,
+          movie_id: this.currentMovie.id,
+          session_id: this.currentSession.id,
+          seats: this.selectedSeats.map(seat => ({ row: seat.row, seat: seat.seat })),
+          total_price: total,
+        };
     
-      // Guardamos los asientos como ocupados
-      this.occupiedSeats = [...this.occupiedSeats, ...authStore.selectedSeats];
+        console.log("Datos enviados para la reserva:", reservationData);
     
-      // Reset de asientos seleccionados
-      authStore.selectedSeats = [];
-      this.selectedSeats = [];
+        const response = await fetch('http://127.0.0.1:8000/api/reservations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${authStore.token}`,
+          },
+          body: JSON.stringify(reservationData),
+        });
+    
+        if (!response.ok) throw new Error('Error al realizar la reserva');
+    
+        // Limpiar los asientos seleccionados
+        this.selectedSeats = [];
+        
+        // Actualizar los asientos ocupados
+        const data = await response.json();
+        console.log("Respuesta del backend:", data);
+        
+        this.occupiedSeats = [...this.occupiedSeats, ...this.selectedSeats];
+    
+        alert(`Compra confirmada: ${this.selectedSeats.length} butacas por ${total}€`);
+    
+        // Redirige a una página de confirmación
+        this.router.push('/confirmation');  // Asegúrate de tener una ruta '/confirmation' configurada
+      } catch (error) {
+        console.error("Error al confirmar la compra:", error);
+        alert('No se pudo completar la reserva');
+      }
     }
-    }
-       
-     
+  }
 });
