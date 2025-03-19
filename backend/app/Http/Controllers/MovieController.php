@@ -22,11 +22,7 @@ class MovieController extends Controller
     // Mostrar una película
     public function show(Movie $movie)
     {
-        if (request()->expectsJson()) {
-            return response()->json($movie);
-        }
-
-        return view('movies.show', compact('movie'));
+        return response()->json($movie); 
     }
 
     // Guardar una nueva película

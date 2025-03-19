@@ -10,10 +10,18 @@ use Illuminate\Validation\Rule;
 class SessionMovieController extends Controller
 {
     // Listar todas las sesiones (para web y API)
-    public function index()
+  // Listar todas las sesiones (para web y API)
+public function index(Request $request)
 {
+    $query = SessionMovie::query();
+
+    // Filtrar por movieId si existe en la request
+    if ($request->has('movieId')) {
+        $query->where('movie_id', $request->movieId);
+    }
+
     // Obtener las sesiones de los próximos 12 días con horario de 16:00
-    $sessions = SessionMovie::with('movie')
+    $sessions = $query->with('movie')
         ->where('date', '>=', now()->toDateString())
         ->where('date', '<=', now()->addDays(12)->toDateString())
         ->where('time', '16:00') // Filtrar por horario de 16:00
@@ -21,6 +29,7 @@ class SessionMovieController extends Controller
 
     return response()->json($sessions);
 }
+
 
     // Mostrar una sesión específica
     public function show(SessionMovie $sessionMovie)

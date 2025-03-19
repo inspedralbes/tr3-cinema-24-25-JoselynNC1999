@@ -55,65 +55,99 @@ export const useTheaterStore = defineStore('theater', {
   },
 
   actions: {
+    
     async fetchMovieById(movieId) {
       try {
-        const response = await fetch(`/api/movies/${movieId}`);
+        console.log(`Fetching movie with ID: ${movieId}`);
+        const response = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}`);
         if (!response.ok) throw new Error('Error al obtener la película');
-        this.currentMovie = await response.json();
+        const data = await response.json();
+        console.log('Movie fetched:', data);
+        this.currentMovie = data;
       } catch (error) {
-        console.error(error);
+        console.error('Error en fetchMovieById:', error);
       }
     },
 
     async fetchSessionByMovieId(movieId) {
       try {
-        const response = await fetch(`/api/sessions?movieId=${movieId}`);
+        console.log(`Fetching session for movie ID: ${movieId}`);
+        const response = await fetch(`http://127.0.0.1:8000/api/sessions?movieId=${movieId}`);
+        
         if (!response.ok) throw new Error('Error al obtener la sesión');
+        
         const sessions = await response.json();
-        this.currentSession = sessions[0]; // Supongamos que solo hay una sesión activa
+        console.log('Sessions fetched:', sessions);
+        
+        // Asigna la primera sesión disponible (o null si no hay sesiones)
+        this.currentSession = sessions.length ? sessions[0] : null;
+        
+        // Si hay sesión, se obtienen los asientos ocupados
+        if (this.currentSession) {
+          await this.fetchOccupiedSeats(this.currentSession.id);
+        }
       } catch (error) {
-        console.error(error);
+        console.error('Error en fetchSessionByMovieId:', error);
       }
     },
+    
 
     async fetchOccupiedSeats(sessionId) {
       try {
+        console.log(`Fetching occupied seats for session ID: ${sessionId}`);
         const response = await fetch(`/api/seats?sessionId=${sessionId}`);
         if (!response.ok) throw new Error('Error al obtener asientos ocupados');
-        this.occupiedSeats = await response.json();
+        const data = await response.json();
+        console.log('Occupied seats fetched:', data);
+        this.occupiedSeats = data;
       } catch (error) {
-        console.error(error);
+        console.error('Error en fetchOccupiedSeats:', error);
       }
     },
 
     async loadMovieAndSession(movieId) {
-      // Cargar la película
-      const movie = await this.fetchMovie(movieId);
-      this.currentMovie = movie;
-  
-      // Cargar la sesión relacionada con esta película
-      const session = await this.fetchSession(movieId);
-      this.currentSession = session;
+      console.log(`Loading movie and session for ID: ${movieId}`);
+      await this.fetchMovieById(movieId);
+      
+      if (this.currentMovie) {
+        console.log('Movie successfully set, now fetching session...');
+        await this.fetchSessionByMovieId(movieId);
+        
+        if (this.currentSession) {
+          console.log('Session successfully set, now fetching occupied seats...');
+          await this.fetchOccupiedSeats(this.currentSession.id);
+        } else {
+          console.warn('No session found for this movie.');
+        }
+      } else {
+        console.warn('No movie found with this ID.');
+      }
     },
 
     toggleSeat(row, seat) {
-      if (this.isSeatOccupied(row, seat)) return;
+      if (this.isSeatOccupied(row, seat)) {
+        console.warn(`Seat ${row}${seat} is already occupied!`);
+        return;
+      }
 
       const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat === seat);
 
       if (seatIndex !== -1) {
+        console.log(`Deselecting seat: ${row}${seat}`);
         this.selectedSeats.splice(seatIndex, 1);
       } else {
         if (this.selectedSeats.length >= 10) {
           alert('No puedes seleccionar más de 10 butacas por sesión');
           return;
         }
+        console.log(`Selecting seat: ${row}${seat}`);
         this.selectedSeats.push({ row, seat });
       }
     },
 
     toggleDiscountDay() {
       this.isDiscountDay = !this.isDiscountDay;
+      console.log(`Discount day toggled: ${this.isDiscountDay}`);
     },
 
     confirmPurchase() {
@@ -125,6 +159,7 @@ export const useTheaterStore = defineStore('theater', {
       const seatCount = this.selectedSeats.length;
       const total = this.totalPrice;
 
+      console.log(`Confirming purchase: ${seatCount} seats, total price: ${total}€`);
       alert(`Compra confirmada: ${seatCount} butacas por ${total}€`);
 
       this.occupiedSeats = [...this.occupiedSeats, ...this.selectedSeats];

@@ -213,7 +213,7 @@ const sessionTime = computed(() => {
 });
 
 const theaterRoom = computed(() => {
-  return theaterStore.currentSession?.room || 'Sala no disponible';
+  return theaterStore.currentSession?.room || 'Sala 1';
 });
 
 // Format price to EUR
