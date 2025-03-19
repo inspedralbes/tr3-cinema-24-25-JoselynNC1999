@@ -66,12 +66,13 @@
             <!-- Confirmación -->
             <div class="mt-8 text-center">
               <NuxtLink 
-                v-if="theaterStore.selectedSeats.length > 0"
-                to="/entrada"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-              >
-                Confirmar Compra
-              </NuxtLink>
+              v-if="theaterStore.selectedSeats.length > 0"
+              :to="`/entrada/${route.params.id}`"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+            >
+              Confirmar Compra
+            </NuxtLink>
+
             </div>
             
             <!-- Info adicional -->
@@ -111,11 +112,12 @@ const route = useRoute();
 
 // Obtener el ID de la película de la URL y cargar los datos al montar la página
 onMounted(() => {
-  const movieId = route.params.id;
+  const movieId = route.params.id;  // Obtiene el ID de la película de la URL
   if (movieId) {
     theaterStore.loadMovieAndSession(movieId);
   }
 });
+
 
 // Función para remover un asiento desde el resumen
 const removeSeat = (seat) => {

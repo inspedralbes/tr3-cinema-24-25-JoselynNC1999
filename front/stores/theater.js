@@ -87,11 +87,13 @@ export const useTheaterStore = defineStore('theater', {
     },
 
     async loadMovieAndSession(movieId) {
-      await this.fetchMovieById(movieId);
-      await this.fetchSessionByMovieId(movieId);
-      if (this.currentSession) {
-        await this.fetchOccupiedSeats(this.currentSession.id);
-      }
+      // Cargar la película
+      const movie = await this.fetchMovie(movieId);
+      this.currentMovie = movie;
+  
+      // Cargar la sesión relacionada con esta película
+      const session = await this.fetchSession(movieId);
+      this.currentSession = session;
     },
 
     toggleSeat(row, seat) {

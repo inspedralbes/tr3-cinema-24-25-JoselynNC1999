@@ -48,8 +48,13 @@
                       <div class="absolute inset-0 bg-gradient-to-t from-blue-900/70 to-transparent"></div>
                     </div>
                   </div>
-                  <h3 class="text-xl font-bold mb-2">{{ movieTitle }}</h3>
-                  <p class="text-blue-300 mb-1">{{ movieGenre }} | {{ movieDuration }}</p>
+                  <h3 class="text-xl font-bold mb-2">{{ theaterStore.currentMovie?.title }}</h3>
+<p class="text-blue-300 mb-1">{{ theaterStore.currentMovie?.genre }} | {{ theaterStore.currentMovie?.duration }} min</p>
+
+<img v-if="theaterStore.currentMovie?.poster" 
+     :src="theaterStore.currentMovie.poster" 
+     alt="Movie poster" class="object-cover w-full h-full" />
+
                   <div class="flex mb-2">
                     <div class="text-yellow-400 flex">
                       <span v-for="star in 5" :key="star" 
@@ -177,16 +182,17 @@ import PromoSection from '@/components/layout/PromoSection.vue';
 import NewsletterSection from '@/components/sections/NewsletterSection.vue';
 import TheFooter from '@/components/layout/TheFooter.vue';
 
+
+
 const route = useRoute();
 const theaterStore = useTheaterStore();
+const movieId = ref(route.params.id);
 
 // Generate a random order code
 const orderCode = ref('CINP' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'));
 
 // Get movie ID from the store or route
-const movieId = computed(() => {
-  return theaterStore.currentMovie?.id || route.params.id || '';
-});
+
 
 // Computed properties based on theaterStore data
 const movieTitle = computed(() => theaterStore.currentMovie?.title || 'Película');
@@ -215,10 +221,9 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR' }).format(price);
 };
 
-onMounted(() => {
-  // If current movie isn't loaded, try to load it from the route params
-  if (!theaterStore.currentMovie && route.params.id) {
-    theaterStore.loadMovieAndSession(route.params.id);
+onMounted(async () => {
+  if (movieId.value) {
+    await theaterStore.loadMovieAndSession(movieId.value);
   }
 });
 </script>
