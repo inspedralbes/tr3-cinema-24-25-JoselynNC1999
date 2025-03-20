@@ -1,10 +1,10 @@
 <script setup>
-import { useAuth } from '@/composables/useAuth';
-import { reactive, ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'; // Importar la store de autenticación
 
-const { register } = useAuth();
-const router = useRouter(); // Instancia del router
+const authStore = useAuthStore();
+const router = useRouter();
 
 const user = reactive({
   name: '',
@@ -17,23 +17,22 @@ const acceptTerms = ref(false);
 
 const handleRegister = async () => {
   try {
-    // Validación de contraseñas
     if (user.password !== user.confirmPassword) {
       registerError.value = 'Las contraseñas no coinciden';
       return;
     }
 
-    // Validación de términos
     if (!acceptTerms.value) {
       registerError.value = 'Debes aceptar los términos y condiciones';
       return;
     }
 
     registerError.value = '';
-    await register(user);
+    await authStore.register(user); // Usar la store de autenticación
 
-    // Redirigir a la Landing Page (index.vue)
-    router.push('/');
+    console.log('✅ Usuario registrado:', JSON.parse(JSON.stringify(authStore.user)));
+
+    router.push('/'); // Redirigir a la página principal después del registro
   } catch (error) {
     console.error('Error en el registro', error);
     registerError.value = 'Error al registrar usuario. Por favor, inténtalo de nuevo.';
@@ -41,7 +40,7 @@ const handleRegister = async () => {
 };
 
 const showLogin = () => {
-  router.push('/'); // Redirige al landing page (index.vue)
+  router.push('/'); // Redirigir a la página de inicio de sesión
 };
 </script>
 
