@@ -23,17 +23,26 @@ watch(() => authStore.user, (newUser) => {
 
 const handleLogin = async () => {
   try {
-    loginError.value = '';
-    await authStore.login(credentials); // Espera que termine el login
+    loginError.value = ''
+    await authStore.login(credentials)
 
-    console.log('✅ Usuario autenticado (handleLogin en Login.vue):', JSON.parse(JSON.stringify(authStore.user)));
+    console.log('✅ Usuario autenticado:', authStore.user)
 
-    router.push('/'); // Redirige después del login exitoso
+    // Si el usuario tenía una película guardada, redirigirlo a esa película
+    if (authStore.selectedMovie) {
+      const movieId = authStore.selectedMovie.id
+      authStore.selectedMovie = null // Limpiamos el estado después de redirigir
+      router.push(`/movies/${movieId}`)
+    } else {
+      // Si no, lo enviamos al home
+      router.push('/')
+    }
   } catch (error) {
-    console.error('Error en el login', error);
-    loginError.value = 'Error al iniciar sesión. Verifica tus credenciales.';
+    console.error('Error en el login', error)
+    loginError.value = 'Error al iniciar sesión. Verifica tus credenciales.'
   }
-};
+}
+
 
 
 const showRegister = () => {

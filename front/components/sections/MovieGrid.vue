@@ -53,34 +53,45 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMovieStore } from '@/stores/movies'
 import { useSessionStore } from '@/stores/sessions'
+import { useAuthStore } from '@/stores/auth' // Importamos el store de autenticación
 
 const movieStore = useMovieStore()
 const sessionStore = useSessionStore()
+const authStore = useAuthStore() // Accedemos a la autenticación
+const router = useRouter()
 
 // Función para obtener las sesiones de una película específica
 const sessionsForMovie = (movieId) => {
-  // Filtrar las sesiones que correspondan a la película
   return sessionStore.sessions.filter(session => session.movie_id === movieId)
 }
 
-// Función para comprar entradas (por ahora solo loguea la película)
+// Función para manejar la compra de entradas
 const buyTicket = (movie) => {
-  console.log(`Comprando entradas para ${movie.title}`)
+  if (!authStore.isAuthenticated) {
+    // Guardamos la película seleccionada para después
+    authStore.selectMovie(movie)
+    
+    // Redirigimos al login
+    router.push('/login')
+  } else {
+    // Si el usuario está autenticado, lo llevamos a la página de compra
+    router.push(`/movies/${movie.id}`)
+  }
 }
 
-// Cargar las películas y sesiones cuando se monta el componente
+// Cargar películas y sesiones al montar el componente
 onMounted(async () => {
   if (movieStore.regularMovies.length === 0) {
-    await movieStore.fetchMovies() // Cargar películas si no están en el store
+    await movieStore.fetchMovies()
   }
 
-  // Cargar las sesiones para todas las películas
   for (const movie of movieStore.regularMovies) {
     if (!sessionStore.sessions.some(session => session.movie_id === movie.id)) {
-      await sessionStore.fetchSessions(movie.id) // Obtener sesiones por película
+      await sessionStore.fetchSessions(movie.id)
     }
   }
 })
