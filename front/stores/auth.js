@@ -1,19 +1,16 @@
 import { defineStore } from 'pinia';
-import { useCookie } from '#app';
-import { useTheaterStore } from './theater';  // Asegúrate de importar el store de theater
-
+import { useTheaterStore } from './theater';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: useCookie('token'), // Guardar el token en la cookie
-    user: null,
+    token: process.client ? localStorage.getItem('token') || null : null,
+    user: process.client ? JSON.parse(localStorage.getItem('user')) || null : null,
     selectedMovie: null,
     selectedSession: null,
     selectedSeats: [],
   }),
 
   getters: {
-    // Verificar si el usuario está autenticado comprobando la existencia del token
     isAuthenticated: (state) => !!state.token,
   },
 
@@ -25,10 +22,20 @@ export const useAuthStore = defineStore('auth', {
           method: 'POST',
           body: user,
         });
+
         this.token = response.token;
         this.user = response.user;
+
+        if (process.client) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(JSON.parse(JSON.stringify(response.user))));
+        }
+
+        console.log('✅ Registro exitoso:', this.user);
+        console.log('🔑 Token guardado:', this.token);
+
       } catch (error) {
-        console.error(error);
+        console.error('❌ Error en el registro:', error);
         throw error;
       }
     },
@@ -43,17 +50,29 @@ export const useAuthStore = defineStore('auth', {
 
         this.token = response.token;
         this.user = response.user;
-        console.log("Token guardado:", this.token);
-        console.log("Usuario autenticado:", JSON.parse(JSON.stringify(this.user)));
 
-        // Sincronizar con theaterStore los valores anteriores de la película, sesión y asientos
+        if (process.client) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(JSON.parse(JSON.stringify(response.user))));
+        }
+
+        // Convertir la cadena JSON de 'user' en un objeto JavaScript
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // Ahora puedes trabajar con el objeto 'user'
+        console.log(user); // Deberías ver el objeto como un objeto normal y no como una cadena JSON
+        console.log(user.name); // Acceder a propiedades del objeto
+
+        console.log('✅ Usuario autenticado:', this.user);
+        console.log('🔑 Token guardado:', this.token);
+
         const theaterStore = useTheaterStore();
         if (theaterStore.selectedMovie) this.selectedMovie = theaterStore.selectedMovie;
         if (theaterStore.selectedSession) this.selectedSession = theaterStore.selectedSession;
         if (theaterStore.selectedSeats.length > 0) this.selectedSeats = [...theaterStore.selectedSeats];
 
       } catch (error) {
-        console.error("Error en el login", error);
+        console.error('❌ Error en el login:', error);
         throw error;
       }
     },
@@ -71,8 +90,16 @@ export const useAuthStore = defineStore('auth', {
         this.selectedMovie = null;
         this.selectedSession = null;
         this.selectedSeats = [];
+
+        if (process.client) {
+          localStorage.setItem('token', null);
+          localStorage.setItem('user', null);
+        }
+
+        console.log('🔴 Usuario desconectado. Token eliminado.');
+
       } catch (error) {
-        console.error(error);
+        console.error('❌ Error en el logout:', error);
       }
     },
 
@@ -98,7 +125,6 @@ export const useAuthStore = defineStore('auth', {
       const theaterStore = useTheaterStore();
       theaterStore.selectedSeats = seats;  // Sincronizar con theaterStore
     },
-
 
     // Realizar compra de entradas
     async purchaseTickets() {
