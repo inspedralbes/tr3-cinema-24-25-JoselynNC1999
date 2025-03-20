@@ -34,7 +34,6 @@
               </div>
             </div>
             
-            
             <!-- Purchase details -->
             <div class="p-6 md:p-8">
               <div class="md:flex gap-6">
@@ -42,19 +41,20 @@
                 <div class="md:w-1/3 mb-6 md:mb-0">
                   <div class="bg-blue-800 rounded-lg overflow-hidden mb-4">
                     <div class="aspect-[2/3] flex items-center justify-center relative">
-                      <img v-if="theaterStore.currentMovie?.poster" :src="theaterStore.currentMovie.poster" 
-                           alt="Movie poster" class="object-cover w-full h-full" />
-                      <span v-else class="text-4xl">🎬</span>
+                      <img v-if="theaterStore.currentMovie?.poster_url" 
+                           :src="theaterStore.currentMovie.poster_url" 
+                           alt="Movie poster" 
+                           class="object-cover w-full h-full" />
+                      <img v-else 
+                           src="https://via.placeholder.com/500x750" 
+                           alt="Placeholder poster" 
+                           class="object-cover w-full h-full" />
                       <div class="absolute inset-0 bg-gradient-to-t from-blue-900/70 to-transparent"></div>
                     </div>
                   </div>
                   <h3 class="text-xl font-bold mb-2">{{ theaterStore.currentMovie?.title }}</h3>
-<p class="text-blue-300 mb-1">{{ theaterStore.currentMovie?.genre }} | {{ theaterStore.currentMovie?.duration }} min</p>
-
-<img v-if="theaterStore.currentMovie?.poster" 
-     :src="theaterStore.currentMovie.poster" 
-     alt="Movie poster" class="object-cover w-full h-full" />
-
+                  <p class="text-blue-300 mb-1">{{ theaterStore.currentMovie?.genre }} | {{ theaterStore.currentMovie?.duration }} min</p>
+               
                   <div class="flex mb-2">
                     <div class="text-yellow-400 flex">
                       <span v-for="star in 5" :key="star" 
@@ -246,3 +246,5 @@ onMounted(async () => {
 .animate-float-delay { animation: float-delay 7s ease-in-out infinite; }
 .animate-float-delay-long { animation: float-delay-long 9s ease-in-out infinite; }
 </style>
+
+
