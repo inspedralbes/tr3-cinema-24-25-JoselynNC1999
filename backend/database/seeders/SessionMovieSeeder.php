@@ -7,6 +7,7 @@ use App\Models\SessionMovie;
 use App\Models\Movie;
 use Carbon\Carbon;
 
+
 class SessionMovieSeeder extends Seeder
 {
     /**
@@ -23,24 +24,21 @@ class SessionMovieSeeder extends Seeder
             return;
         }
 
-        // Definir las fechas de prueba (una fecha por cada película)
-        $dates = [];
+        // Establecer el día de hoy
+        $today = Carbon::today(); // Obtiene la fecha de hoy en el momento de ejecución
+
+        // Crear sesiones para cada película con días continuos
         for ($i = 0; $i < $movies->count(); $i++) { // Usar el número de películas
-            $dates[] = Carbon::today()->addDays($i)->toDateString();
-        }
+            $date = $today->copy()->addDays($i); // Usamos copy() para no modificar la variable $today original
 
-        // Horario único: 16:00
-        $time = '16:00';
-
-        // Crear sesiones para cada fecha
-        foreach ($dates as $index => $date) {
             // Seleccionar una película diferente para cada fecha
-            $movie = $movies[$index % $movies->count()]; // Usar módulo para evitar desbordamiento
+            $movie = $movies[$i % $movies->count()]; // Usar índice directamente para evitar desbordamiento
 
+            // Crear la sesión
             SessionMovie::create([
                 'movie_id' => $movie->id, // ID de la película actual
-                'date' => $date,
-                'time' => $time,
+                'date' => $date->toDateString(), // Convertir la fecha a formato de string
+                'time' => '16:00',
                 'is_special' => false, // Por defecto, no es una sesión especial
             ]);
         }
