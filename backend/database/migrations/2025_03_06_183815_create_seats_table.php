@@ -4,28 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up()
-{
-    Schema::create('seats', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('session_id')->constrained('session_movies')->onDelete('cascade');
-        $table->string('row'); // Fila de la butaca (ej. "A", "B", etc.)
-        $table->integer('number'); // Número de la butaca (ej. 1, 2, etc.)
-        $table->enum('status', ['available', 'occupied', 'selected'])->default('available'); // Estado de la butaca
-        $table->enum('type', ['normal', 'VIP'])->default('normal'); // Tipo de butaca
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('seats', function (Blueprint $table) {
+            $table->id();
+            $table->string('row'); // Letra de la fila (A, B, C, ...)
+            $table->integer('number'); // Número del asiento en la fila (1, 2, 3, ...)
+            $table->enum('type', ['normal', 'vip'])->default('normal'); // Tipo de asiento
+            $table->timestamps();
+        });
+    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('seats');
     }

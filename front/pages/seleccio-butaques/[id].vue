@@ -64,12 +64,14 @@
             <!-- Confirmación -->
             <div class="mt-8 text-center">
               <NuxtLink 
-              v-if="theaterStore.selectedSeats.length > 0"
-              :to="`/entrada/${route.params.id}`"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-            >
-              Confirmar Compra
-            </NuxtLink>
+            v-if="theaterStore.selectedSeats.length > 0"
+            @click.prevent="theaterStore.reserveSeats()"
+            :to="`/entrada/${route.params.id}`"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+          >
+            Confirmar Compra
+          </NuxtLink>
+
 
             </div>
             

@@ -2,48 +2,31 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Seat;
-use App\Models\SessionMovie;
+use Illuminate\Support\Facades\DB;
 
 class SeatSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        // Obtener todas las sesiones de película
-        $sessions = SessionMovie::all();
+        $rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+        $seatsPerRow = 10;
+        $vipRow = 'F'; // Fila VIP
 
-        // Definir las filas y números de los asientos (esto puede cambiar según tu sala)
-        $rows = ['A', 'B', 'C', 'D', 'E']; // 5 filas
-        $numbers = range(1, 20); // 20 asientos por fila (1-20)
+        $seats = [];
 
-        // Crear asientos para cada sesión de película
-        foreach ($sessions as $session) {
-            foreach ($rows as $row) {
-                foreach ($numbers as $number) {
-                    Seat::create([
-                        'session_id' => $session->id,  // Relacionamos el asiento con la sesión de película
-                        'row' => $row,  // Fila del asiento (A, B, C, etc.)
-                        'number' => $number,  // Número del asiento (1, 2, 3, etc.)
-                        'status' => 'available',  // Estado inicial: disponible
-                        'type' => $this->getSeatType($row),  // Tipo de asiento (normal o VIP)
-                    ]);
-                }
+        foreach ($rows as $row) {
+            for ($number = 1; $number <= $seatsPerRow; $number++) {
+                $seats[] = [
+                    'row' => $row,
+                    'number' => $number,
+                    'type' => $row === $vipRow ? 'vip' : 'normal',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
             }
         }
-    }
 
-    /**
-     * Método para asignar tipo de asiento según la fila.
-     * Puedes personalizar este método si deseas definir las filas VIP.
-     */
-    private function getSeatType($row)
-    {
-        // Supongamos que las filas A y B son VIP y las demás son normales.
-        return in_array($row, ['A', 'B']) ? 'VIP' : 'normal';
+        DB::table('seats')->insert($seats);
     }
 }

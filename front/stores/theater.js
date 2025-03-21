@@ -111,16 +111,16 @@ export const useTheaterStore = defineStore('theater', {
 
     async fetchOccupiedSeats(sessionId) {
       try {
-        console.log(`Fetching occupied seats for session ID: ${sessionId}`);
-        const response = await fetch(`/api/seats?sessionId=${sessionId}`);
+        const response = await fetch(`http://127.0.0.1:8000/api/seats/${sessionId}`);
         if (!response.ok) throw new Error('Error al obtener asientos ocupados');
-        const data = await response.json();
-        console.log('Occupied seats fetched:', data);
-        this.occupiedSeats = data;
+        
+        const seats = await response.json();
+        this.occupiedSeats = seats.filter(seat => seat.status === 'occupied');
       } catch (error) {
         console.error('Error en fetchOccupiedSeats:', error);
       }
     },
+    
 
     async loadMovieAndSession(movieId) {
       console.log(`Loading movie and session for ID: ${movieId}`);
@@ -140,6 +140,39 @@ export const useTheaterStore = defineStore('theater', {
         console.warn('No movie found with this ID.');
       }
     },
+    async reserveSeats() {
+      if (!this.selectedSeats.length) {
+        alert('Debes seleccionar al menos una butaca');
+        return;
+      }
+    
+      const authStore = useAuthStore();
+      if (!authStore.user) {
+        alert('Debes iniciar sesión para reservar');
+        return;
+      }
+    
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/reserve-seats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: authStore.user.id,
+            session_id: this.currentSession.id,
+            seats: this.selectedSeats,
+          }),
+        });
+    
+        if (!response.ok) throw new Error('Error al reservar butacas');
+    
+        alert('Reserva exitosa');
+        this.selectedSeats = [];
+        await this.fetchOccupiedSeats(this.currentSession.id);
+      } catch (error) {
+        console.error('Error al reservar butacas:', error);
+      }
+    },
+    
 
     toggleSeat(row, seat) {
       if (this.isSeatOccupied(row, seat)) {
