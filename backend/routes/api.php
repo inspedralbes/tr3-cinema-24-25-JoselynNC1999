@@ -18,9 +18,10 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('movies', MovieController::class);
 Route::apiResource('sessions', SessionMovieController::class);
-Route::apiResource('seats', SeatController::class);
 Route::apiResource('tickets', TicketController::class);
 Route::apiResource('users', UserController::class);
+Route::get('/seats', [SeatController::class, 'index']);
+
 
 // Ruta para obtener las sesiones de una película específica
 Route::get('/movies/{movie_id}/sessions', [SessionMovieController::class, 'getSessionsByMovie']);
@@ -43,5 +44,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::get('/seats/{sessionId}', [SeatsController::class, 'getSeatsBySession']);
-Route::post('/reserve-seats', [SeatsController::class, 'reserveSeats']);
+Route::post('/reserve-seats', [SeatController::class, 'reserveSeats']);
+
+Route::post('/reservations', [ReservationController::class, 'storeReservation']);
+
+Route::get('/sessions/{sessionId}/seats', [SeatController::class, 'getSeatsBySession']);
+Route::get('/seats/all', [SeatController::class, 'getAllSeats']);
+
+Route::get('/sessions/{sessionId}/occupied-seats', [SeatController::class, 'getOccupiedSeats']);
+
+
+
+
+
+

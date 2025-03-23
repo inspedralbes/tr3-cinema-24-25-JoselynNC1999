@@ -9,11 +9,15 @@ return new class extends Migration {
     {
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
-            $table->string('row'); // Letra de la fila (A, B, C, ...)
-            $table->integer('number'); // Número del asiento en la fila (1, 2, 3, ...)
-            $table->enum('type', ['normal', 'vip'])->default('normal'); // Tipo de asiento
+            $table->unsignedBigInteger('session_id'); 
+            $table->foreign('session_id')->references('id')->on('session_movies')->onDelete('cascade'); // Corregido
+            $table->string('row');
+            $table->integer('number');
+            $table->boolean('status')->default(false);
+            $table->string('type');
             $table->timestamps();
         });
+        
     }
 
     public function down()

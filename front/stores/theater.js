@@ -1,5 +1,6 @@
 // stores/theater.js
 import { defineStore } from 'pinia';
+import { useAuthStore } from './auth'; 
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -19,7 +20,8 @@ export const useTheaterStore = defineStore('theater', {
     currentMovie: null, // Se cargará dinámicamente
     currentSession: null, // Se cargará dinámicamente
     occupiedSeats: [], // Se cargará dinámicamente
-    selectedSeats: []
+    selectedSeats: [],
+    allSeats: []
   }),
 
   getters: {
@@ -55,6 +57,31 @@ export const useTheaterStore = defineStore('theater', {
   },
 
   actions: {
+
+    async fetchSeats(sessionId) {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/seats`);  
+        if (!response.ok) throw new Error('Error al obtener los asientos');
+    
+        let seats = await response.json();
+        console.log('Seats response:', seats);
+    
+        // Convertir a array si el backend devolvió un solo objeto
+        if (!Array.isArray(seats)) {
+          console.warn('El backend devolvió un objeto en lugar de un array:', seats);
+          seats = [seats];
+        }
+    
+        // Guardar todos los asientos para poder obtener los IDs
+        this.allSeats = seats;
+        
+        // Filtrar los ocupados
+        this.occupiedSeats = seats.filter(seat => seat.status === true);
+      } catch (error) {
+        console.error('Error en fetchSeats:', error);
+      }
+    },
+  
     
     async fetchMovieById(movieId) {
       try {
@@ -111,17 +138,33 @@ export const useTheaterStore = defineStore('theater', {
 
     async fetchOccupiedSeats(sessionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/seats/${sessionId}`);
-        if (!response.ok) throw new Error('Error al obtener asientos ocupados');
-        
-        const seats = await response.json();
-        this.occupiedSeats = seats.filter(seat => seat.status === 'occupied');
+        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/occupied-seats`);
+        if (!response.ok) throw new Error("Error al obtener asientos ocupados");
+    
+        let seats = await response.json();
+        console.log("Seats response:", seats);
+    
+        // 🔥 Asegurar que `seats` siempre sea un array
+        if (!Array.isArray(seats)) {
+          console.warn("El backend devolvió un objeto en lugar de un array:", seats);
+          seats = [seats]; // Convertimos el objeto en un array
+        }
+    
+        // 🔥 Convertimos `seats` al formato correcto
+        this.occupiedSeats = seats.map(seat => ({
+          id: seat.id,
+          row: seat.row,
+          seat: seat.number, // Usar `number`, no `seat`
+          status: seat.status
+        }));
+    
+        console.log("Asientos ocupados cargados correctamente:", this.occupiedSeats);
       } catch (error) {
-        console.error('Error en fetchOccupiedSeats:', error);
+        console.error("Error en fetchOccupiedSeats:", error);
+        this.occupiedSeats = []; // Para evitar que sea undefined
       }
     },
     
-
     async loadMovieAndSession(movieId) {
       console.log(`Loading movie and session for ID: ${movieId}`);
       await this.fetchMovieById(movieId);
@@ -142,57 +185,89 @@ export const useTheaterStore = defineStore('theater', {
     },
     async reserveSeats() {
       if (!this.selectedSeats.length) {
-        alert('Debes seleccionar al menos una butaca');
+        alert("Debes seleccionar al menos una butaca");
         return;
       }
     
       const authStore = useAuthStore();
       if (!authStore.user) {
-        alert('Debes iniciar sesión para reservar');
+        alert("Debes iniciar sesión para reservar");
         return;
       }
     
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/reserve-seats', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        // Filtrar los asientos que tengan ID
+        const seatIds = this.selectedSeats.map(seat => seat.id).filter(id => id);
+    
+        // Verificar que haya IDs para reservar
+        if (seatIds.length === 0) {
+          console.error("No se encontraron IDs para los asientos seleccionados:", this.selectedSeats);
+          alert("Error: No se encontraron IDs válidos para reservar. Por favor, actualiza la página e intenta de nuevo.");
+          return;
+        }
+    
+        console.log("Reservando asientos con IDs:", seatIds);
+    
+        const response = await fetch("http://127.0.0.1:8000/api/reserve-seats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: authStore.user.id,
             session_id: this.currentSession.id,
-            seats: this.selectedSeats,
+            seat_ids: seatIds,
           }),
         });
     
-        if (!response.ok) throw new Error('Error al reservar butacas');
+        const data = await response.json();
+        console.log("Reserva response:", data);
     
-        alert('Reserva exitosa');
+        if (!response.ok) throw new Error(data.message || "Error al reservar butacas");
+    
+        //alert("Reserva exitosa");
         this.selectedSeats = [];
-        await this.fetchOccupiedSeats(this.currentSession.id);
+        await this.fetchSeats(this.currentSession.id);
+        
       } catch (error) {
-        console.error('Error al reservar butacas:', error);
+        console.error("Error al reservar butacas:", error);
+        //alert(`Error al reservar: ${error.message}`);
       }
     },
     
-
+    
     toggleSeat(row, seat) {
-      if (this.isSeatOccupied(row, seat)) {
-        console.warn(`Seat ${row}${seat} is already occupied!`);
+      console.log(`Clic en asiento: ${row}${seat}`);
+    
+      // Buscar en occupiedSeats
+      const isOccupied = this.occupiedSeats.some(s => s.row === row && s.seat == seat);
+    
+      if (isOccupied) {
+        console.warn(`El asiento ${row}${seat} ya está ocupado!`);
         return;
       }
-
-      const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat === seat);
-
+    
+      // Buscar en selectedSeats
+      const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat == seat);
+    
       if (seatIndex !== -1) {
         console.log(`Deselecting seat: ${row}${seat}`);
         this.selectedSeats.splice(seatIndex, 1);
       } else {
         if (this.selectedSeats.length >= 10) {
-          alert('No puedes seleccionar más de 10 butacas por sesión');
+          alert("No puedes seleccionar más de 10 butacas por sesión");
           return;
         }
-        console.log(`Selecting seat: ${row}${seat}`);
-        this.selectedSeats.push({ row, seat });
+        
+        // Buscar el ID del asiento en todos los asientos disponibles
+        const seatId = this.getAvailableSeatId(row, seat);
+        
+        console.log(`Selecting seat: ${row}${seat} with ID: ${seatId}`);
+        this.selectedSeats.push({ id: seatId, row, seat });
       }
+    },
+    getAvailableSeatId(row, seat) {
+      // Primero, intentar encontrar el asiento en los asientos disponibles
+      const availableSeat = this.allSeats?.find(s => s.row === row && s.number == seat);
+      return availableSeat?.id || null;
     },
 
     toggleDiscountDay() {

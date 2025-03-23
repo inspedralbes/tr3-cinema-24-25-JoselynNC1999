@@ -2,7 +2,6 @@
   <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
     <TheHeader />
     
-    <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
       <section class="py-8 px-6 relative overflow-hidden">
         <div class="container mx-auto relative z-10">
           <!-- Breadcrumb Navigation -->
@@ -64,15 +63,13 @@
             <!-- Confirmación -->
             <div class="mt-8 text-center">
               <NuxtLink 
-            v-if="theaterStore.selectedSeats.length > 0"
-            @click.prevent="theaterStore.reserveSeats()"
-            :to="`/entrada/${route.params.id}`"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-          >
-            Confirmar Compra
-          </NuxtLink>
-
-
+                v-if="theaterStore.selectedSeats.length > 0"
+                @click.prevent="reserveSeats" 
+                :to="`/entrada/${route.params.id}`"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+              >
+                Confirmar Compra
+              </NuxtLink>
             </div>
             
             <!-- Info adicional -->
@@ -83,7 +80,7 @@
           </div>
         </div>
       </section>
-    </div>
+    
     
     <PromoSection class="my-12" />
     <NewsletterSection class="mt-16" />
@@ -95,6 +92,7 @@
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTheaterStore } from '@/stores/theater';
+import { useAuthStore } from '@/stores/auth'; // Si necesitas comprobar si el usuario está autenticado
 
 import BreadcrumbNavigation from '@/components/cinema/BreadcrumbNavigation.vue';
 import SessionInfo from '@/components/cinema/SessionInfo.vue';
@@ -107,19 +105,34 @@ import TheFooter from '@/components/layout/TheFooter.vue';
 import TicketSummary from '@/components/cinema/TicketSummary.vue';
 
 const theaterStore = useTheaterStore();
+const authStore = useAuthStore(); // Si usas un store de autenticación
 const route = useRoute();
 
 // Obtener el ID de la película de la URL y cargar los datos al montar la página
-onMounted(() => {
-  const movieId = route.params.id;  // Obtiene el ID de la película de la URL
+onMounted(async () => {
+  const movieId = route.params.id;
   if (movieId) {
-    theaterStore.loadMovieAndSession(movieId);
+    await theaterStore.loadMovieAndSession(movieId);
+    
+    // Solo cargar los asientos si tenemos una sesión
+    if (theaterStore.currentSession?.id) {
+      await theaterStore.fetchSeats(theaterStore.currentSession.id);
+      console.log("Asientos ocupados:", theaterStore.occupiedSeats);
+    }
   }
 });
-
 
 // Función para remover un asiento desde el resumen
 const removeSeat = (seat) => {
   theaterStore.toggleSeat(seat.row, seat.seat);
+};
+
+// Función para reservar los asientos
+const reserveSeats = async () => {
+  if (authStore.user) {
+    await theaterStore.reserveSeats();
+  } else {
+    alert('Debes iniciar sesión para reservar');
+  }
 };
 </script>
