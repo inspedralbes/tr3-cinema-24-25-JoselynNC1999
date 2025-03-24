@@ -197,6 +197,7 @@ import TheHeader from '@/components/layout/TheHeader.vue';
 import PromoSection from '@/components/layout/PromoSection.vue';
 import NewsletterSection from '@/components/sections/NewsletterSection.vue';
 import TheFooter from '@/components/layout/TheFooter.vue';
+import { useAuthStore } from '~/stores/auth'
 import { nextTick } from "vue";
 
 
@@ -207,6 +208,7 @@ const movieId = ref(route.params.id);
 const isSendingEmail = ref(false); 
 
 const sendEmail = async () => {
+  const authStore = useAuthStore(); // Get the auth store
   isSendingEmail.value = true;
 
   // Función robusta para formatear fecha
@@ -215,7 +217,6 @@ const sendEmail = async () => {
     if (dateValue instanceof Date && !isNaN(dateValue)) {
       return dateValue.toISOString().split('T')[0];
     }
-
     // Si es un string
     if (typeof dateValue === 'string') {
       // Intenta parsear diferentes formatos
@@ -226,7 +227,6 @@ const sendEmail = async () => {
         return parsedDate.toISOString().split('T')[0];
       }
     }
-
     // Si todo falla, usa la fecha actual
     return new Date().toISOString().split('T')[0];
   };
@@ -242,16 +242,19 @@ const sendEmail = async () => {
     let cleanTime = timeValue.replace('h', '').trim();
     
     // Si no tiene formato de hora, usa una hora por defecto
-    return cleanTime.length === 5 ? cleanTime : '20:00';
+    return cleanTime.length === 5 ? cleanTime : '16:00';
   };
 
   try {
-    // Depuración de valores
-    console.log('sessionDate raw:', sessionDate.value);
-    console.log('sessionTime raw:', sessionTime.value);
+    // Obtener el correo directamente del auth store
+    const userEmail = authStore.user?.email;
+
+    if (!userEmail) {
+      throw new Error('No se encontró un correo electrónico para el usuario');
+    }
 
     const reservationData = {
-      user_id: theaterStore.currentUser?.id || 1, 
+      user_id: authStore.user?.id || 1, 
       session_id: theaterStore.currentSession?.id || 123, 
       movie_title: theaterStore.currentMovie?.title || 'Película',
       date: formatDate(sessionDate.value), 
@@ -264,7 +267,7 @@ const sendEmail = async () => {
         price: theaterStore.getPricePerSeat(seat.row)
       })),
       total_price: theaterStore.totalPrice,
-      email: theaterStore.currentUser?.email || 'joselynelvira99@gmail.com', 
+      email: userEmail, // Usar el correo del auth store
     };
 
     // Log de datos para depuración
