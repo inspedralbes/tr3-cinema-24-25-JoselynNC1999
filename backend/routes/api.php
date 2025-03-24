@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\EmailController;
 
 
 
@@ -56,6 +57,7 @@ Route::get('/sessions/{sessionId}/occupied-seats', [SeatController::class, 'getO
 
 Route::get('/reservations', [ReservationController::class, 'index']);
 Route::get('/reservations/{id}', [ReservationController::class, 'show']);
+Route::post('/send-ticket-email', [EmailController::class, 'sendTicketEmail']);
 
 
 

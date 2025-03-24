@@ -141,12 +141,14 @@
                       </svg>
                       Descarregar entrades
                     </button>
-                    <button class="flex-1 border-2 border-blue-400 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all">
-                      <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                      </svg>
-                      Enviar per email
-                    </button>
+                    <button @click="sendEmail" :disabled="isSendingEmail" 
+  class="flex-1 border-2 border-blue-400 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all">
+  <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+  </svg>
+  {{ isSendingEmail ? 'Enviando...' : 'Enviar por email' }}
+</button>
+
                   </div>
                 </div>
               </div>
@@ -202,7 +204,99 @@ const totalPrice = computed(() => theaterStore.totalPrice);
 const route = useRoute();
 const theaterStore = useTheaterStore();
 const movieId = ref(route.params.id);
+const isSendingEmail = ref(false); 
 
+const sendEmail = async () => {
+  isSendingEmail.value = true;
+
+  // Función robusta para formatear fecha
+  const formatDate = (dateValue) => {
+    // Si ya es un objeto Date válido
+    if (dateValue instanceof Date && !isNaN(dateValue)) {
+      return dateValue.toISOString().split('T')[0];
+    }
+
+    // Si es un string
+    if (typeof dateValue === 'string') {
+      // Intenta parsear diferentes formatos
+      const parsedDate = new Date(dateValue);
+      
+      // Verifica si la fecha es válida
+      if (!isNaN(parsedDate)) {
+        return parsedDate.toISOString().split('T')[0];
+      }
+    }
+
+    // Si todo falla, usa la fecha actual
+    return new Date().toISOString().split('T')[0];
+  };
+
+  // Función para formatear hora
+  const formatTime = (timeValue) => {
+    // Si ya está en formato HH:MM, devuélvelo
+    if (/^\d{2}:\d{2}$/.test(timeValue)) {
+      return timeValue;
+    }
+    
+    // Elimina la 'h' y otros caracteres
+    let cleanTime = timeValue.replace('h', '').trim();
+    
+    // Si no tiene formato de hora, usa una hora por defecto
+    return cleanTime.length === 5 ? cleanTime : '20:00';
+  };
+
+  try {
+    // Depuración de valores
+    console.log('sessionDate raw:', sessionDate.value);
+    console.log('sessionTime raw:', sessionTime.value);
+
+    const reservationData = {
+      user_id: theaterStore.currentUser?.id || 1, 
+      session_id: theaterStore.currentSession?.id || 123, 
+      movie_title: theaterStore.currentMovie?.title || 'Película',
+      date: formatDate(sessionDate.value), 
+      time: formatTime(sessionTime.value), 
+      room: theaterRoom.value || 'Sala 1', 
+      seats: theaterStore.selectedSeats.map(seat => ({
+        row: seat.row,
+        number: seat.seat,
+        type: theaterStore.isVipSeat(seat.row, seat.seat) ? 'VIP' : 'Estándar',
+        price: theaterStore.getPricePerSeat(seat.row)
+      })),
+      total_price: theaterStore.totalPrice,
+      email: theaterStore.currentUser?.email || 'joselynelvira99@gmail.com', 
+    };
+
+    // Log de datos para depuración
+    console.log('Datos a enviar:', reservationData);
+
+    const response = await fetch('http://localhost:8000/api/send-ticket-email', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reservationData),
+    });
+
+    // Log de estado de respuesta
+    console.log('Estado de respuesta:', response.status);
+
+    const responseData = await response.json();
+    console.log('Datos de respuesta:', responseData);
+
+    // Verificar el mensaje de éxito específico
+    if (responseData.message === "Correo enviado con éxito") {
+      alert('Correo enviado con éxito!');
+    } else {
+      throw new Error(responseData.message || 'Error desconocido');
+    }
+  } catch (error) {
+    console.error('Error completo:', error);
+    alert(`No se pudo enviar el correo: ${error.message}`);
+  } finally {
+    isSendingEmail.value = false;
+  }
+};
 // Generate a random order code
 const orderCode = ref('CINP' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'));
 

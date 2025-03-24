@@ -80,9 +80,6 @@ export const useTheaterStore = defineStore('theater', {
       }
     },
     
-    
-  
-    
     async fetchMovieById(movieId) {
       try {
         console.log(`Fetching movie with ID: ${movieId}`);
@@ -156,8 +153,7 @@ export const useTheaterStore = defineStore('theater', {
         console.error("Error en fetchOccupiedSeats:", error);
         // 🔥 NO limpiar `occupiedSeats` aquí para evitar que desaparezcan visualmente
       }
-    }
-    ,
+    },
     
     async loadMovieAndSession(movieId) {
       console.log(`Loading movie and session for ID: ${movieId}`);
@@ -210,11 +206,6 @@ export const useTheaterStore = defineStore('theater', {
     
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Error al reservar butacas");
-    
-        // ❌ Evita limpiar `selectedSeats` inmediatamente
-        // this.selectedSeats = []; ❌
-    
-        // ✅ Muestra el precio por unos segundos antes de actualizar los asientos
         setTimeout(() => {
           this.selectedSeats = [];
           this.fetchSeats(this.currentSession.id);
