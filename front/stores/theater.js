@@ -39,7 +39,7 @@ export const useTheaterStore = defineStore('theater', {
     },
 
     isSeatOccupied: (state) => (row, seat) => {
-      return state.occupiedSeats.some(s => s.row === row && s.seat === seat);
+      return state.occupiedSeats.some(s => s.row === row && (s.seat == seat || s.number == seat));
     },
 
     isSeatSelected: (state) => (row, seat) => {
@@ -49,38 +49,37 @@ export const useTheaterStore = defineStore('theater', {
     isVipSeat: (state) => (row) => row === state.vipRow,
 
     getSeatClass: (state) => (row, seat) => {
-      if (state.isSeatOccupied(row, seat)) return 'bg-red-500'; // Ocupada (Rojo)
-      if (state.isSeatSelected(row, seat)) return 'bg-green-500'; // Seleccionada (Verde)
+      if (state.isSeatOccupied(row, seat)) return 'bg-red-500 cursor-not-allowed'; // Ocupado (Rojo)
+      if (state.isSeatSelected(row, seat)) return 'bg-green-500'; // Seleccionado (Verde)
       if (state.isVipSeat(row)) return 'bg-purple-500'; // VIP (Morado)
       return 'bg-gray-500'; // Disponible (Gris)
-    }
+    },
+    
   },
 
   actions: {
 
     async fetchSeats(sessionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/seats`);  
+        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/seats`);
         if (!response.ok) throw new Error('Error al obtener los asientos');
     
         let seats = await response.json();
         console.log('Seats response:', seats);
     
-        // Convertir a array si el backend devolvió un solo objeto
-        if (!Array.isArray(seats)) {
-          console.warn('El backend devolvió un objeto en lugar de un array:', seats);
-          seats = [seats];
-        }
+        if (!Array.isArray(seats)) seats = [seats];
     
-        // Guardar todos los asientos para poder obtener los IDs
         this.allSeats = seats;
         
-        // Filtrar los ocupados
-        this.occupiedSeats = seats.filter(seat => seat.status === true);
+        // ✅ Llamar a `fetchOccupiedSeats` directamente después de cargar todos los asientos
+        await this.fetchOccupiedSeats(sessionId);
+        
       } catch (error) {
         console.error('Error en fetchSeats:', error);
       }
     },
+    
+    
   
     
     async fetchMovieById(movieId) {
@@ -134,36 +133,30 @@ export const useTheaterStore = defineStore('theater', {
       }
     },
     
-    
-
     async fetchOccupiedSeats(sessionId) {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/occupied-seats`);
         if (!response.ok) throw new Error("Error al obtener asientos ocupados");
     
         let seats = await response.json();
-        console.log("Seats response:", seats);
+        console.log("Occupied seats response:", seats);
     
-        // 🔥 Asegurar que `seats` siempre sea un array
-        if (!Array.isArray(seats)) {
-          console.warn("El backend devolvió un objeto en lugar de un array:", seats);
-          seats = [seats]; // Convertimos el objeto en un array
-        }
+        if (!Array.isArray(seats)) seats = [seats];
     
-        // 🔥 Convertimos `seats` al formato correcto
         this.occupiedSeats = seats.map(seat => ({
           id: seat.id,
           row: seat.row,
-          seat: seat.number, // Usar `number`, no `seat`
+          seat: seat.number, 
           status: seat.status
         }));
     
-        console.log("Asientos ocupados cargados correctamente:", this.occupiedSeats);
+        console.log("Asientos ocupados actualizados:", this.occupiedSeats);
       } catch (error) {
         console.error("Error en fetchOccupiedSeats:", error);
-        this.occupiedSeats = []; // Para evitar que sea undefined
+        // 🔥 NO limpiar `occupiedSeats` aquí para evitar que desaparezcan visualmente
       }
-    },
+    }
+    ,
     
     async loadMovieAndSession(movieId) {
       console.log(`Loading movie and session for ID: ${movieId}`);
@@ -196,13 +189,9 @@ export const useTheaterStore = defineStore('theater', {
       }
     
       try {
-        // Filtrar los asientos que tengan ID
         const seatIds = this.selectedSeats.map(seat => seat.id).filter(id => id);
-    
-        // Verificar que haya IDs para reservar
         if (seatIds.length === 0) {
-          console.error("No se encontraron IDs para los asientos seleccionados:", this.selectedSeats);
-          alert("Error: No se encontraron IDs válidos para reservar. Por favor, actualiza la página e intenta de nuevo.");
+          alert("Error: No se encontraron IDs válidos para reservar.");
           return;
         }
     
@@ -219,35 +208,30 @@ export const useTheaterStore = defineStore('theater', {
         });
     
         const data = await response.json();
-        console.log("Reserva response:", data);
-    
         if (!response.ok) throw new Error(data.message || "Error al reservar butacas");
     
-        //alert("Reserva exitosa");
         this.selectedSeats = [];
+        
+        // ✅ Volver a obtener los asientos para reflejar los cambios
         await this.fetchSeats(this.currentSession.id);
         
       } catch (error) {
         console.error("Error al reservar butacas:", error);
-        //alert(`Error al reservar: ${error.message}`);
       }
-    },
+    }
+    ,
     
     
     toggleSeat(row, seat) {
       console.log(`Clic en asiento: ${row}${seat}`);
     
-      // Buscar en occupiedSeats
-      const isOccupied = this.occupiedSeats.some(s => s.row === row && s.seat == seat);
-    
-      if (isOccupied) {
+      // Usar el getter para comprobar si está ocupado
+      if (this.isSeatOccupied(row, seat)) {
         console.warn(`El asiento ${row}${seat} ya está ocupado!`);
         return;
       }
-    
-      // Buscar en selectedSeats
-      const seatIndex = this.selectedSeats.findIndex(s => s.row === row && s.seat == seat);
-    
+      const seatIndex = this.selectedSeats.findIndex(s => s.row === row && (s.seat == seat || s.number == seat));
+
       if (seatIndex !== -1) {
         console.log(`Deselecting seat: ${row}${seat}`);
         this.selectedSeats.splice(seatIndex, 1);
@@ -261,12 +245,22 @@ export const useTheaterStore = defineStore('theater', {
         const seatId = this.getAvailableSeatId(row, seat);
         
         console.log(`Selecting seat: ${row}${seat} with ID: ${seatId}`);
-        this.selectedSeats.push({ id: seatId, row, seat });
+        this.selectedSeats.push({ id: seatId, row, seat, number: seat });
       }
     },
+    
     getAvailableSeatId(row, seat) {
-      // Primero, intentar encontrar el asiento en los asientos disponibles
-      const availableSeat = this.allSeats?.find(s => s.row === row && s.number == seat);
+      // Intentar encontrar el asiento usando ambas propiedades
+      const availableSeat = this.allSeats?.find(s => 
+        s.row === row && (s.number == seat || s.seat == seat)
+      );
+      
+      if (availableSeat) {
+        console.log(`Found seat ID ${availableSeat.id} for ${row}${seat}`);
+      } else {
+        console.warn(`No se encontró ID para el asiento ${row}${seat}`);
+      }
+      
       return availableSeat?.id || null;
     },
 

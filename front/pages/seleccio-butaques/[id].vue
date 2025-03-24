@@ -47,14 +47,16 @@
                 <div class="w-8 flex items-center justify-center text-blue-300 font-semibold">{{ row }}</div>
                 <div class="flex gap-2">
                   <button 
-                    v-for="seat in theaterStore.seatsPerRow" 
-                    :key="`${row}-${seat}`"
-                    :class="[ 
-                      'w-8 h-8 rounded-t-lg transition-all transform hover:scale-110',
-                      theaterStore.getSeatClass(row, seat)
-                    ]"
-                    @click="theaterStore.toggleSeat(row, seat)"
-                  ></button>
+  v-for="seat in theaterStore.seatsPerRow" 
+  :key="`${row}-${seat}`"
+  :class="[ 
+    'w-8 h-8 rounded-t-lg transition-all transform hover:scale-110',
+    theaterStore.getSeatClass(row, seat)
+  ]"
+  @click="!theaterStore.isSeatOccupied(row, seat) && theaterStore.toggleSeat(row, seat)"
+  :disabled="theaterStore.isSeatOccupied(row, seat)"
+></button>
+
                 </div>
                 <div class="w-8 flex items-center justify-center text-blue-300 font-semibold">{{ row }}</div>
               </div>
@@ -110,15 +112,25 @@ const route = useRoute();
 
 // Obtener el ID de la película de la URL y cargar los datos al montar la página
 onMounted(async () => {
-  const movieId = route.params.id;
-  if (movieId) {
-    await theaterStore.loadMovieAndSession(movieId);
+  try {
+    const movieId = route.params.id;
+    console.log('Página montada, ID de película:', movieId);
     
-    // Solo cargar los asientos si tenemos una sesión
-    if (theaterStore.currentSession?.id) {
-      await theaterStore.fetchSeats(theaterStore.currentSession.id);
-      console.log("Asientos ocupados:", theaterStore.occupiedSeats);
+    if (movieId) {
+      // Cargar datos de película y sesión primero
+      await theaterStore.loadMovieAndSession(movieId);
+      
+      // Luego buscar asientos si tenemos una sesión
+      if (theaterStore.currentSession?.id) {
+        console.log('Buscando asientos para la sesión ID:', theaterStore.currentSession.id);
+        await theaterStore.fetchSeats(theaterStore.currentSession.id);
+        console.log("Asientos ocupados:", theaterStore.occupiedSeats);
+      } else {
+        console.warn('No hay ID de sesión disponible para buscar asientos');
+      }
     }
+  } catch (error) {
+    console.error('Error al cargar datos del teatro:', error);
   }
 });
 
