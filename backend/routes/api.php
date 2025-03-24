@@ -9,6 +9,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservationController;
 
 
 
@@ -52,6 +53,11 @@ Route::get('/sessions/{sessionId}/seats', [SeatController::class, 'getSeatsBySes
 Route::get('/seats/all', [SeatController::class, 'getAllSeats']);
 
 Route::get('/sessions/{sessionId}/occupied-seats', [SeatController::class, 'getOccupiedSeats']);
+
+Route::get('/reservations', [ReservationController::class, 'index']);
+Route::get('/reservations/{id}', [ReservationController::class, 'show']);
+
+
 
 
 

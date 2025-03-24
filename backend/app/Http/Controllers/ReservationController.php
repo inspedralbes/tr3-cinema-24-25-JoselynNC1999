@@ -6,9 +6,39 @@ use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\Seat;
 use App\Models\SessionMovie;
+use Illuminate\Support\Facades\DB;
+
 
 class ReservationController extends Controller
 {
+
+    public function index()
+{
+    return response()->json(Reservation::all());
+}
+
+
+public function show($id)
+{
+    $reservation = Reservation::find($id);
+
+    if (!$reservation) {
+        return response()->json(['message' => 'Reserva no encontrada'], 404);
+    }
+
+    // Obtener los asientos de la reserva
+    $seats = DB::table('reservation_seat')
+        ->where('reservation_id', $id)
+        ->join('seats', 'reservation_seat.seat_id', '=', 'seats.id')
+        ->select('seats.*')
+        ->get();
+
+    return response()->json([
+        'reservation' => $reservation,
+        'seats' => $seats
+    ]);
+}
+
 
     public function storeReservation(Request $request)
 {
