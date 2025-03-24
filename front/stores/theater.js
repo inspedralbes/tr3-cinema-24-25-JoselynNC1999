@@ -26,13 +26,14 @@ export const useTheaterStore = defineStore('theater', {
 
   getters: {
     getPricePerSeat: (state) => (row) => {
+      if (!row) return 0; // Evita valores undefined
       const isVip = row === state.vipRow;
       return isVip
         ? (state.isDiscountDay ? state.prices.discountVip : state.prices.vip)
         : (state.isDiscountDay ? state.prices.discountNormal : state.prices.normal);
     },
 
-    totalPrice: (state) => {
+    totalPrice(state) {
       return state.selectedSeats.reduce((total, seat) => {
         return total + state.getPricePerSeat(seat.row);
       }, 0);
@@ -210,17 +211,18 @@ export const useTheaterStore = defineStore('theater', {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Error al reservar butacas");
     
-        this.selectedSeats = [];
-        
-        // ✅ Volver a obtener los asientos para reflejar los cambios
-        await this.fetchSeats(this.currentSession.id);
-        
+        // ❌ Evita limpiar `selectedSeats` inmediatamente
+        // this.selectedSeats = []; ❌
+    
+        // ✅ Muestra el precio por unos segundos antes de actualizar los asientos
+        setTimeout(() => {
+          this.selectedSeats = [];
+          this.fetchSeats(this.currentSession.id);
+        }, 120000); 
       } catch (error) {
         console.error("Error al reservar butacas:", error);
       }
-    }
-    ,
-    
+    },
     
     toggleSeat(row, seat) {
       console.log(`Clic en asiento: ${row}${seat}`);

@@ -90,35 +90,49 @@
                   </div>
                   
                   <!-- Tickets list -->
-                  <div class="bg-blue-900/50 rounded-xl p-6 mb-6">
-                    <h3 class="text-lg font-semibold mb-4 border-b border-blue-800 pb-2">Les teves entrades</h3>
-                    
-                    <div class="space-y-3 mb-4">
-                      <div v-for="(seat, index) in theaterStore.selectedSeats" :key="index" class="flex justify-between items-center">
-                        <div class="flex items-center">
-                          <div class="w-8 h-8 rounded-lg flex items-center justify-center mr-2"
-                            :class="theaterStore.isVipSeat(seat.row, seat.seat) ? 'bg-purple-600' : 'bg-blue-600'">
-                            <span class="font-bold text-sm">{{ seat.row }}{{ seat.seat }}</span>
-                          </div>
-                          <span>Butaca {{ theaterStore.isVipSeat(seat.row, seat.seat) ? 'VIP' : 'Estàndard' }}</span>
-                        </div>
-                        <div class="text-right">
-                          <span class="font-bold">{{ formatPrice(theaterStore.getPricePerSeat(seat.row, seat.seat)) }}</span>
-                          <span class="text-xs text-blue-300 block" v-if="theaterStore.isDiscountDay">Amb descompte 2x1</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <!-- Total -->
-                    <div class="border-t border-blue-800 pt-4 mt-4">
-                      <div class="flex justify-between items-center">
-                        <span class="text-lg">Total</span>
-                        <span class="text-2xl font-bold">{{ formatPrice(theaterStore.totalPrice) }}</span>
-                      </div>
-                      <p class="text-xs text-blue-300 text-right mt-1">IVA inclòs</p>
-                    </div>
-                  </div>
-                  
+<div class="bg-blue-900/50 rounded-xl p-6 mb-6">
+  <h3 class="text-lg font-semibold mb-4 border-b border-blue-800 pb-2">Les teves entrades</h3>
+
+  <div class="space-y-3 mb-4">
+    <div 
+      v-for="(seat, index) in theaterStore.selectedSeats" 
+      :key="index" 
+      class="flex justify-between items-center"
+    >
+      <!-- Butaca info -->
+      <div class="flex items-center">
+        <div 
+          class="w-8 h-8 rounded-lg flex items-center justify-center mr-2"
+          :class="theaterStore.isVipSeat(seat.row, seat.seat) ? 'bg-purple-600' : 'bg-blue-600'"
+        >
+          <span class="font-bold text-sm">{{ seat.row }}{{ seat.seat }}</span>
+        </div>
+        <span>
+          Butaca 
+          <strong>{{ theaterStore.isVipSeat(seat.row, seat.seat) ? 'VIP' : 'Estàndard' }}</strong>
+        </span>
+      </div>
+
+      <!-- Precio -->
+      <div class="text-right">
+        <span class="font-bold">
+          {{ theaterStore.getPricePerSeat(seat.row) }}€
+        </span>                        
+        <span v-if="theaterStore.isDiscountDay" class="text-xs text-blue-300 block">
+          Amb descompte 2x1
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Price (siempre visible) -->
+  <div class="text-right border-t border-blue-800 pt-3">
+    <span class="text-lg font-bold">
+      Total: {{ theaterStore.totalPrice }}€
+    </span>
+  </div>
+</div>
+
                   <!-- Actions -->
                   <div class="flex flex-col sm:flex-row gap-4">
                     <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all">
@@ -181,9 +195,10 @@ import TheHeader from '@/components/layout/TheHeader.vue';
 import PromoSection from '@/components/layout/PromoSection.vue';
 import NewsletterSection from '@/components/sections/NewsletterSection.vue';
 import TheFooter from '@/components/layout/TheFooter.vue';
+import { nextTick } from "vue";
 
 
-
+const totalPrice = computed(() => theaterStore.totalPrice);
 const route = useRoute();
 const theaterStore = useTheaterStore();
 const movieId = ref(route.params.id);
@@ -224,7 +239,8 @@ const formatPrice = (price) => {
 onMounted(async () => {
   if (movieId.value) {
     await theaterStore.loadMovieAndSession(movieId.value);
-    await theaterStore.fetchMovieDetails(movieId.value);  // Aquí haces la llamada para obtener los detalles
+    await theaterStore.fetchMovieDetails(movieId.value);
+    await nextTick(); // Espera a que la UI se actualice completamente
   }
 });
 </script>
