@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
+use App\Mail\LoginNotification;
 
 class AuthController extends Controller
 {
@@ -23,7 +26,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-
+        Mail::to($user->email)->send(new WelcomeMail($user));
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['user' => $user, 'token' => $token], 201);
@@ -41,6 +44,8 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        Mail::to($user->email)->send(new LoginNotification($user));
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['user' => $user, 'token' => $token]);
