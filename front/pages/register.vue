@@ -32,7 +32,7 @@ const handleRegister = async () => {
 
     console.log('✅ Usuario registrado:', JSON.parse(JSON.stringify(authStore.user)));
 
-    router.push('/'); // Redirigir a la página principal después del registro
+    router.push('/login'); // Redirigir a la página principal después del registro
   } catch (error) {
     console.error('Error en el registro', error);
     registerError.value = 'Error al registrar usuario. Por favor, inténtalo de nuevo.';
@@ -40,7 +40,7 @@ const handleRegister = async () => {
 };
 
 const showLogin = () => {
-  router.push('/'); // Redirigir a la página de inicio de sesión
+  router.push('/login'); 
 };
 </script>
 
