@@ -199,61 +199,92 @@ import NewsletterSection from '@/components/sections/NewsletterSection.vue';
 import TheFooter from '@/components/layout/TheFooter.vue';
 import { useAuthStore } from '~/stores/auth'
 import { nextTick } from "vue";
-
+import QRCode from 'qrcode'; // Make sure to install this package
 
 const totalPrice = computed(() => theaterStore.totalPrice);
 const route = useRoute();
 const theaterStore = useTheaterStore();
 const movieId = ref(route.params.id);
-const isSendingEmail = ref(false); 
+const isSendingEmail = ref(false);
+const ticketsWithQRs = ref([]);
+
+// QR Code Generation Function
+const generateTicketQRs = async (reservationData) => {
+  const generateQRForSeat = async (seat, index) => {
+    // Create a unique ticket identifier
+    const ticketId = `${reservationData.movie_title}-${reservationData.date}-${reservationData.time}-${seat.row}-${seat.number}-${index}`;
+    
+    try {
+      // Generate QR code as a data URL
+      const qrCodeDataUrl = await QRCode.toDataURL(ticketId, {
+        errorCorrectionLevel: 'H',
+        width: 200, // Adjust size as needed
+        margin: 2
+      });
+      return {
+        ...seat,
+        qrCode: qrCodeDataUrl,
+        ticketId: ticketId
+      };
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      return {
+        ...seat,
+        qrCode: null,
+        ticketId: ticketId
+      };
+    }
+  };
+
+  // Generate QR codes for all seats
+  const seatsWithQRs = await Promise.all(
+    reservationData.seats.map((seat, index) => generateQRForSeat(seat, index))
+  );
+
+  // Update the reactive ref to display QRs in the template
+  ticketsWithQRs.value = seatsWithQRs;
+
+  // Return updated reservation data with QR codes
+  return {
+    ...reservationData,
+    seats: seatsWithQRs
+  };
+};
 
 const sendEmail = async () => {
-  const authStore = useAuthStore(); // Get the auth store
+  const authStore = useAuthStore();
   isSendingEmail.value = true;
 
-  // Función robusta para formatear fecha
+  // Existing date and time formatting functions
   const formatDate = (dateValue) => {
-    // Si ya es un objeto Date válido
     if (dateValue instanceof Date && !isNaN(dateValue)) {
       return dateValue.toISOString().split('T')[0];
     }
-    // Si es un string
     if (typeof dateValue === 'string') {
-      // Intenta parsear diferentes formatos
       const parsedDate = new Date(dateValue);
-      
-      // Verifica si la fecha es válida
       if (!isNaN(parsedDate)) {
         return parsedDate.toISOString().split('T')[0];
       }
     }
-    // Si todo falla, usa la fecha actual
     return new Date().toISOString().split('T')[0];
   };
 
-  // Función para formatear hora
   const formatTime = (timeValue) => {
-    // Si ya está en formato HH:MM, devuélvelo
     if (/^\d{2}:\d{2}$/.test(timeValue)) {
       return timeValue;
     }
-    
-    // Elimina la 'h' y otros caracteres
     let cleanTime = timeValue.replace('h', '').trim();
-    
-    // Si no tiene formato de hora, usa una hora por defecto
     return cleanTime.length === 5 ? cleanTime : '16:00';
   };
 
   try {
-    // Obtener el correo directamente del auth store
     const userEmail = authStore.user?.email;
 
     if (!userEmail) {
       throw new Error('No se encontró un correo electrónico para el usuario');
     }
 
-    const reservationData = {
+    const basicReservationData = {
       user_id: authStore.user?.id || 1, 
       session_id: theaterStore.currentSession?.id || 123, 
       movie_title: theaterStore.currentMovie?.title || 'Película',
@@ -267,27 +298,22 @@ const sendEmail = async () => {
         price: theaterStore.getPricePerSeat(seat.row)
       })),
       total_price: theaterStore.totalPrice,
-      email: userEmail, // Usar el correo del auth store
+      email: userEmail,
     };
 
-    // Log de datos para depuración
-    console.log('Datos a enviar:', reservationData);
+    // Generate QR codes for tickets
+    const reservationDataWithQRs = await generateTicketQRs(basicReservationData);
 
     const response = await fetch('http://localhost:8000/api/send-ticket-email', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(reservationData),
+      body: JSON.stringify(reservationDataWithQRs),
     });
 
-    // Log de estado de respuesta
-    console.log('Estado de respuesta:', response.status);
-
     const responseData = await response.json();
-    console.log('Datos de respuesta:', responseData);
 
-    // Verificar el mensaje de éxito específico
     if (responseData.message === "Correo enviado con éxito") {
       alert('Correo enviado con éxito!');
     } else {
@@ -300,6 +326,7 @@ const sendEmail = async () => {
     isSendingEmail.value = false;
   }
 };
+
 // Generate a random order code
 const orderCode = ref('CINP' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'));
 
