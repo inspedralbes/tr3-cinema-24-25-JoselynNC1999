@@ -49,3 +49,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
     Route::apiResource('/admin/movie-sessions', MovieSessionController::class);
 });
+
+Route::get('/dates', [SessionMovieController::class, 'getDates']);
+

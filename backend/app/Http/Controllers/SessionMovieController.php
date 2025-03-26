@@ -6,6 +6,8 @@ use App\Models\SessionMovie;
 use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+
 
 class SessionMovieController extends Controller
 {
@@ -81,6 +83,19 @@ public function index(Request $request)
             'movie' => $movie,
             'sessions' => $sessions
         ]);
+    }
+
+    public function getDates()
+    {
+        // Obtener fechas únicas ordenadas desde hoy en adelante
+        $dates = SessionMovie::where('date', '>=', Carbon::today())
+            ->orderBy('date', 'asc')
+            ->pluck('date')
+            ->map(function ($date) {
+                return Carbon::parse($date)->translatedFormat('D, d M'); // Formato "Lun, 18 Mar"
+            });
+
+        return response()->json($dates);
     }
 
     // Actualizar una sesión
