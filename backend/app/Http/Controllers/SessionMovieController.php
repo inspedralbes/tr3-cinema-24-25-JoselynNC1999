@@ -9,27 +9,26 @@ use Illuminate\Validation\Rule;
 
 class SessionMovieController extends Controller
 {
-    // Listar todas las sesiones (para web y API)
-  // Listar todas las sesiones (para web y API)
+    // Listar todas las sesiones para la web
+   
 public function index(Request $request)
 {
     $query = SessionMovie::query();
 
-    // Filtrar por movieId si existe en la request
     if ($request->has('movieId')) {
         $query->where('movie_id', $request->movieId);
     }
-
-    // Obtener las sesiones de los próximos 12 días con horario de 16:00
     $sessions = $query->with('movie')
-        ->where('date', '>=', now()->toDateString())
-        ->where('date', '<=', now()->addDays(12)->toDateString())
-        ->where('time', '16:00') // Filtrar por horario de 16:00
-        ->get();
+    ->where('date', '>=', now()->toDateString())
+    ->where('date', '<=', now()->addDays(12)->toDateString())
+    ->where('time', '16:00') // Filtrar por horario de 16:00
+    ->get();
+        $movies = Movie::all();
 
-    return response()->json($sessions);
-}
+        return response()->json($sessions);
+        return view('sessions', compact('sessions', 'movies'));
 
+    }
 
     // Mostrar una sesión específica
     public function show(SessionMovie $sessionMovie)
@@ -37,7 +36,6 @@ public function index(Request $request)
         if (request()->wantsJson()) {
             return response()->json($sessionMovie);
         }
-
         return view('sessions.show', compact('sessionMovie'));
     }
 
@@ -50,10 +48,8 @@ public function index(Request $request)
             'is_special' => 'sometimes|boolean',
         ]);
 
-        // Horarios disponibles
         $times = ['16:00', '18:00', '20:00'];
 
-        // Crear una sesión para cada horario
         foreach ($times as $time) {
             SessionMovie::create([
                 'movie_id'   => $request->movie_id,
@@ -62,30 +58,30 @@ public function index(Request $request)
                 'is_special' => $request->is_special ?? false,
             ]);
         }
-
         if ($request->wantsJson()) {
             return response()->json(SessionMovie::where('date', $request->date)->get(), 201);
         }
 
         return redirect()->route('sessions.index')->with('success', 'Sessions creades correctament.');
     }
+
+    // Obtener sesiones por película (para API, no modificado)
     public function getSessionsByMovie($movie_id)
-{
-    // Verificar si la película existe
-    $movie = Movie::find($movie_id);
-    if (!$movie) {
-        return response()->json(['message' => 'Película no encontrada'], 404);
+    {
+            // Verificar si la película existe
+
+        $movie = Movie::find($movie_id);
+        if (!$movie) {
+            return response()->json(['message' => 'Película no encontrada'], 404);
+        }
+
+        $sessions = SessionMovie::where('movie_id', $movie_id)->with('movie')->get();
+
+        return response()->json([
+            'movie' => $movie,
+            'sessions' => $sessions
+        ]);
     }
-
-    // Obtener las sesiones de esa película
-    $sessions = SessionMovie::where('movie_id', $movie_id)->with('movie')->get();
-
-    return response()->json([
-        'movie' => $movie,
-        'sessions' => $sessions
-    ]);
-}
-
 
     // Actualizar una sesión
     public function update(Request $request, SessionMovie $sessionMovie)
@@ -98,7 +94,7 @@ public function index(Request $request)
         ]);
 
         $sessionMovie->update($request->all());
-
+        
         if ($request->wantsJson()) {
             return response()->json($sessionMovie);
         }
@@ -110,7 +106,6 @@ public function index(Request $request)
     public function destroy(SessionMovie $sessionMovie)
     {
         $sessionMovie->delete();
-
         if (request()->wantsJson()) {
             return response()->json(null, 204);
         }

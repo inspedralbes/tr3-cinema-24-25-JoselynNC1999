@@ -1,160 +1,272 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestió de Sessions - Cinema Pedralbes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@section('content')
-<style>
-    .container {
-        width: 80%;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: Arial, sans-serif;
-    }
-    h1, h2 {
-        text-align: center;
-    }
-    .form-container, .sessions-container {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .form-group label {
-        font-weight: bold;
-        display: block;
-    }
-    .form-group input, .form-group select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    .btn {
-        display: inline-block;
-        padding: 10px 15px;
-        text-align: center;
-        border: none;
-        cursor: pointer;
-        color: white;
-        border-radius: 5px;
-        text-decoration: none;
-    }
-    .btn-primary { background: blue; }
-    .btn-success { background: green; }
-    .btn-warning { background: orange; }
-    .btn-danger { background: red; }
-    .btn:hover { opacity: 0.8; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            height: 100vh;
+        }
 
-    .session-item {
-        background: white;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-    }
-    .session-actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-    }
-    .hidden {
-        display: none;
-    }
-</style>
+        .sidebar {
+            width: 250px;
+            background-color: #0A4B96;
+            color: white;
+            padding: 20px;
+        }
 
-<div class="container">
-    <h1>🎬 Gestió de Sessions de Pel·lícules</h1>
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
-    <!-- Formulario para agregar una sesión -->
-    <div class="form-container">
-        <h2>➕ Afegir Nova Sessió</h2>
-        <form action="{{ route('sessions.store') }}" method="POST">
-            @csrf
-            <div class="form-group">
-                <label>Pel·lícula:</label>
-                <select name="movie_id" required>
-                    @foreach(App\Models\Movie::all() as $movie)
-                        <option value="{{ $movie->id }}">{{ $movie->title }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Data:</label>
-                <input type="date" name="date" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .button-primary {
+            background-color: #0A4B96;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .sessions-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .sessions-table {
+            width: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .sessions-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sessions-table th, 
+        .sessions-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .sessions-table thead {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-delete {
+            background-color: #F44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-view {
+            background-color: #0A4B96;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .special-session {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #FF9800;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">CINEMA PEDRALBES</div>
+        <ul class="sidebar-menu">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#" class="active">Gestió de Sessions</a></li>
+            <li><a href="#">Pel·lícules</a></li>
+            <li><a href="#">Entrades</a></li>
+            <li><a href="#">Usuaris</a></li>
+            <li><a href="#">Configuració</a></li>
+        </ul>
     </div>
+    <div class="main-content">
+        <div class="header">
+            <div class="header-title">Gestió de Sessions</div>
+        </div>
 
-    <!-- Llista de Sessions -->
-    <div class="sessions-container">
-        <h2>🎥 Llista de Sessions</h2>
-        @if($sessions->count() > 0)
-            <!-- Agrupar sesiones por fecha -->
-            @php
-                $groupedSessions = $sessions->groupBy('date');
-            @endphp
+        <!-- Success Message -->
+        <div class="alert alert-success" style="display: none;">
+            {{ session('success') }}
+        </div>
 
-            @foreach($groupedSessions as $date => $sessionsGroup)
-                <div class="session-item">
-                    <h3>📅 Data: {{ $date }}</h3>
-                    @foreach($sessionsGroup as $session)
-                        <div style="margin-left: 20px;">
-                            <p>🎬 Pel·lícula: {{ $session->movie->title }}</p>
-                            <p>⏰ Hora: {{ $session->time }}</p>
-
-                            <div class="session-actions">
-                                <!-- Botón Editar -->
-                                <button onclick="toggleEditForm({{ $session->id }})" class="btn btn-warning">Editar</button>
-
-                                <!-- Botón Eliminar -->
-                                <form action="{{ route('sessions.destroy', $session->id) }}" method="POST" onsubmit="return confirm('Estàs segur que vols eliminar aquesta sessió?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </div>
-
-                            <!-- Formulario de Edición -->
-                            <div id="edit-form-{{ $session->id }}" class="hidden">
-                                <h3>✏️ Editar Sessió</h3>
-                                <form action="{{ route('sessions.update', $session->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="form-group">
-                                        <label>Pel·lícula:</label>
-                                        <select name="movie_id" required>
-                                            @foreach(App\Models\Movie::all() as $movie)
-                                                <option value="{{ $movie->id }}" {{ $movie->id == $session->movie_id ? 'selected' : '' }}>
-                                                    {{ $movie->title }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Data:</label>
-                                        <input type="date" name="date" value="{{ $session->date }}" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-success">Guardar</button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
+        <!-- New Session Form -->
+        <div class="sessions-form">
+            <form action="{{ route('sessions.store') }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label for="movie_id" class="form-label">Pel·lícula</label>
+                    <select name="movie_id" id="movie_id" class="form-control" required>
+                        @foreach($movies as $movie)
+                            <option value="{{ $movie->id }}">{{ $movie->title }}</option>
+                        @endforeach
+                    </select>
                 </div>
-            @endforeach
-        @else
-            <p class="text-center">⚠️ No hi ha sessions disponibles.</p>
-        @endif
+                <div class="form-group">
+                    <label for="date" class="form-label">Data</label>
+                    <input type="date" name="date" id="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="is_special" class="form-label">
+                        <input type="checkbox" name="is_special" id="is_special" value="1">
+                        Sessió Especial
+                    </label>
+                </div>
+                <button type="submit" class="button-primary">Crear Sessió</button>
+            </form>
+        </div>
+
+        <!-- Sessions Table -->
+        <div class="sessions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pel·lícula</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Especial</th>
+                        <th>Accions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($sessions as $session)
+                        <tr>
+                            <td>{{ $session->id }}</td>
+                            <td>{{ $session->movie->title }}</td>
+                            <td>{{ $session->date }}</td>
+                            <td>{{ $session->time }}</td>
+                            <td>
+                                @if($session->is_special)
+                                    <span class="special-session">Sí</span>
+                                @else
+                                    No
+                                @endif
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <form action="{{ route('sessions.destroy', $session->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete" onclick="return confirm('Segur que vols eliminar?')">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-
-<script>
-    function toggleEditForm(id) {
-        var form = document.getElementById('edit-form-' + id);
-        form.classList.toggle('hidden');
-    }
-</script>
-
-@endsection
+</body>
+</html>

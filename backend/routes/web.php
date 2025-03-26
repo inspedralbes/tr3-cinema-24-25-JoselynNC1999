@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\SessionMovieController;
 
 
 
@@ -23,4 +24,9 @@ Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.
 Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
 
 Route::resource('movies', MovieController::class)->except(['create', 'edit']);
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+
+Route::resource('sessions', SessionMovieController::class);
 
