@@ -36,7 +36,8 @@
         { title: 'Cartellera', url: '/cartellera' },  
         { title: 'Promocions', url: '/promocions' },
         { title: 'Sobre nosaltres', url: '/sobre' },
-        { title: 'Contacte', url: '/contacte' }
+        { title: 'Contacte', url: '/contacte' },
+        { title: 'Iniciar Sessió', url: '/login' }
       ]
     }
   })

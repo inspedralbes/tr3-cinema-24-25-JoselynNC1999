@@ -47,8 +47,13 @@ class AuthController extends Controller
         Mail::to($user->email)->send(new LoginNotification($user));
 
         $token = $user->createToken('auth_token')->plainTextToken;
+        
 
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+            'is_admin' => $user->is_admin, 
+        ]);
     }
 
     public function logout(Request $request)

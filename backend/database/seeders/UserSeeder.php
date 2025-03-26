@@ -27,12 +27,21 @@ class UserSeeder extends Seeder
             ['name' => 'Tom Holland', 'email' => 'tom@example.com', 'phone' => '555666777', 'password' => 'password123'],
         ];
 
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'phone' => '123456789',
+            'password' => Hash::make('password'), // Contraseña encriptada
+            'is_admin' => 1, // Definir que este usuario es administrador
+        ]);
+
         foreach ($users as $user) {
             User::create([
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'phone' => $user['phone'],
                 'password' => Hash::make($user['password']), // Encripta la contraseña
+                'is_admin' => 0, // Definir que estos usuarios son normales
             ]);
         }
     }
