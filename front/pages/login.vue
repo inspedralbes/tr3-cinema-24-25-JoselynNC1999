@@ -2,6 +2,8 @@
 import { ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'; // Importamos la store de autenticación
+import { toRaw } from 'vue'; // Asegúrate de importar toRaw
+
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -20,29 +22,38 @@ watch(() => authStore.user, (newUser) => {
   }
 }, { immediate: true }); // Esto hará que el watch se ejecute de inmediato si ya hay un usuario
 
-
 const handleLogin = async () => {
   try {
-    loginError.value = ''
-    await authStore.login(credentials)
+    loginError.value = '';
+    await authStore.login(credentials);
 
-    console.log('✅ Usuario autenticado:', authStore.user)
+    // Esperar a que Pinia actualice `authStore.user`
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Si el usuario tenía una película guardada, redirigirlo a esa película
+    // Desenlazar el Proxy para trabajar con el objeto real
+    const rawUser = toRaw(authStore.user);
+
+    console.log('✅ Usuario autenticado:', rawUser);
+
+    // Verificar el rol del usuario (usando rawUser en lugar de authStore.user)
+    if (rawUser && rawUser.is_admin === 1) {
+      console.log('🔑 Usuario Admin detectado');
+      router.push('/admin');
+      return;
+    }
+
     if (authStore.selectedMovie) {
-      const movieId = authStore.selectedMovie.id
-      authStore.selectedMovie = null // Limpiamos el estado después de redirigir
-      router.push(`/movies/${movieId}`)
+      const movieId = authStore.selectedMovie.id;
+      authStore.selectedMovie = null;
+      router.push(`/movies/${movieId}`);
     } else {
-      // Si no, lo enviamos al home
-      router.push('/')
+      router.push('/');
     }
   } catch (error) {
-    console.error('Error en el login', error)
-    loginError.value = 'Error al iniciar sesión. Verifica tus credenciales.'
+    console.error('Error en el login', error);
+    loginError.value = 'Error al iniciar sesión. Verifica tus credenciales.';
   }
-}
-
+};
 
 
 const showRegister = () => {
