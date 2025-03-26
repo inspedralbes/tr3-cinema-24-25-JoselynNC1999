@@ -2,7 +2,7 @@
     <div class="admin-layout">
       <!-- Sidebar -->
       <div class="sidebar">
-        <div class="sidebar-logo">CINEMA PEDRALBES</div>
+        <div class="sidebar-logo">CINÉPOLIS PEDRALBES</div>
         <ul class="sidebar-menu">
           <li><NuxtLink to="/admin" class="block p-3 rounded">Dashboard</NuxtLink></li>
           <li><NuxtLink to="/admin/sessions" class="block p-3 rounded">Gestió de Sessions</NuxtLink></li>
@@ -27,7 +27,9 @@
   
         <div class="movies-grid">
           <div v-for="movie in filteredMovies" :key="movie.id" class="movie-card">
-            <div class="movie-poster">{{ movie.title }}</div>
+            <div class="movie-poster">
+              <img :src="movie.poster_url" alt="Poster" />
+            </div>
             <div class="movie-details">
               <div class="movie-title">{{ movie.title }}</div>
               <div class="movie-info">{{ movie.year }} | {{ movie.genre }}</div>
@@ -38,99 +40,42 @@
             </div>
           </div>
         </div>
-  
-        <!-- Modal for Adding/Editing Movie -->
-        <div v-if="isModalOpen" class="modal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h2>{{ modalTitle }}</h2>
-              <button class="close-button" @click="closeAddMovieModal">&times;</button>
-            </div>
-            <form @submit.prevent="saveMovie">
-              <div style="display: flex; flex-direction: column; gap: 15px;">
-                <input v-model="movieForm.title" type="text" placeholder="Títol de la Pel·lícula" required />
-                <input v-model="movieForm.year" type="text" placeholder="Any" required />
-                <input v-model="movieForm.genre" type="text" placeholder="Gènere" required />
-                <input v-model="movieForm.director" type="text" placeholder="Director" required />
-                <input v-model="movieForm.duration" type="number" placeholder="Durada (minuts)" required />
-                <textarea v-model="movieForm.synopsis" placeholder="Sinopsi" required></textarea>
-                <button type="submit" class="button-primary">Guardar Pel·lícula</button>
-              </div>
-            </form>
-          </div>
-        </div>
       </div>
     </div>
   </template>
   
   <script>
+  import { useMovieStore } from '@/stores/movies'
+  import { computed, ref, onMounted } from 'vue'
+  
   export default {
-    data() {
-      return {
-        searchQuery: '',
-        isModalOpen: false,
-        modalTitle: 'Afegir Nova Pel·lícula',
-        movieForm: {
-          title: '',
-          year: '',
-          genre: '',
-          director: '',
-          duration: '',
-          synopsis: ''
-        },
-        movies: [
-          { id: 1, title: 'Interstellar', year: 2014, genre: 'Ciència-ficció', director: 'Christopher Nolan', duration: 169, synopsis: 'Un grup d\'exploradors viatgen a través d\'un forat de cuc per salvar la humanitat.' },
-          { id: 2, title: 'Dune', year: 2021, genre: 'Ciència-ficció', director: 'Denis Villeneuve', duration: 155, synopsis: 'En un futur llunyà, un jove ha de lluitar per sobreviure en un món ple de perills.' },
-          { id: 3, title: 'Oppenheimer', year: 2023, genre: 'Biografia, Drama', director: 'Christopher Nolan', duration: 180, synopsis: 'La història del científic J. Robert Oppenheimer i el desenvolupament de la bomba atòmica.' },
-          { id: 4, title: 'Avatar', year: 2009, genre: 'Ciència-ficció', director: 'James Cameron', duration: 162, synopsis: 'Un ex-marine es converteix en part d\'una tribu indígena en un planeta llunyà.' }
-        ]
-      };
-    },
-    computed: {
-      filteredMovies() {
-        return this.movies.filter(movie => {
+    setup() {
+      const movieStore = useMovieStore();
+      const searchQuery = ref('');
+  
+      onMounted(() => {
+        movieStore.fetchMovies();
+      });
+  
+      const filteredMovies = computed(() => {
+        return movieStore.movies.filter(movie => {
           return (
-            movie.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            movie.year.toString().includes(this.searchQuery) ||
-            movie.genre.toLowerCase().includes(this.searchQuery.toLowerCase())
+            movie.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            movie.year.toString().includes(searchQuery.value) ||
+            movie.genre.toLowerCase().includes(searchQuery.value.toLowerCase())
           );
         });
-      }
-    },
-    methods: {
-      openAddMovieModal() {
-        this.isModalOpen = true;
-        this.modalTitle = 'Afegir Nova Pel·lícula';
-        this.movieForm = { title: '', year: '', genre: '', director: '', duration: '', synopsis: '' };
-      },
-      closeAddMovieModal() {
-        this.isModalOpen = false;
-      },
-      saveMovie() {
-        if (this.movieForm.title && this.movieForm.year && this.movieForm.genre) {
-          this.movies.push({
-            ...this.movieForm,
-            id: this.movies.length + 1
-          });
-          this.closeAddMovieModal();
-        }
-      },
-      editMovie(movie) {
-        this.isModalOpen = true;
-        this.modalTitle = 'Editar Pel·lícula';
-        this.movieForm = { ...movie };
-      },
-      deleteMovie(movie) {
-        const index = this.movies.findIndex(m => m.id === movie.id);
-        if (index !== -1) {
-          this.movies.splice(index, 1);
-        }
-      },
-      searchMovies() {
-        // You can implement a more advanced search logic if necessary
-      }
+      });
+  
+      return {
+        searchQuery,
+        filteredMovies,
+        openAddMovieModal: () => {},
+        editMovie: () => {},
+        deleteMovie: () => {},
+      };
     }
-  };
+  }
   </script>
   
   <style scoped>

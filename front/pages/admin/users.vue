@@ -2,7 +2,7 @@
     <div class="admin-layout">
       <!-- Sidebar -->
       <div class="sidebar">
-        <div class="sidebar-logo">CINEMA PEDRALBES</div>
+        <div class="sidebar-logo">CINÉPOLIS PEDRALBES</div>
         <ul class="sidebar-menu">
           <li><NuxtLink to="/admin" class="block p-3 rounded">Dashboard</NuxtLink></li>
           <li><NuxtLink to="/admin/sessions" class="block p-3 rounded">Gestió de Sessions</NuxtLink></li>

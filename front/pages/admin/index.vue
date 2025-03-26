@@ -11,8 +11,10 @@
         <li><NuxtLink to="/admin" class="block p-3 rounded bg-white bg-opacity-20">Dashboard</NuxtLink></li>
         <li><NuxtLink to="/admin/sessions" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Gestió de Sessions</NuxtLink></li>
         <li><NuxtLink to="/admin/movies" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Pel·lícules</NuxtLink></li>
-        <li><NuxtLink to="/admin/tickets" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Entrades</NuxtLink></li>
+        <li><NuxtLink to="/admin/reserves" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Reserves</NuxtLink></li>
         <li><NuxtLink to="/admin/users" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Usuaris</NuxtLink></li>
+        <li><NuxtLink to="/admin/ocupacio" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Ocupació</NuxtLink></li>
+        <li><NuxtLink to="/admin/Reportes" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Reportes</NuxtLink></li>
         <li><NuxtLink to="/admin/settings" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Configuració</NuxtLink></li>
       </ul>
     </aside>
