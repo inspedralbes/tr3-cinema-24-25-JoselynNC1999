@@ -1,12 +1,12 @@
 @component('mail::message')
-# Notificación de Inicio de Sesión
+# Notificació d'inici de sessió
 
 Hola, {{ $user->name }}.
 
-Hemos detectado un inicio de sesión en tu cuenta.
+Hem detectat un inici de sessió al teu compte.
 
-Si no fuiste tú, por favor contacta con el soporte.
+Si no vas ser tu, si us plau contacta amb el suport.
 
-Gracias,<br>
+Gràcies,<br>
 {{ config('app.name') }}
 @endcomponent

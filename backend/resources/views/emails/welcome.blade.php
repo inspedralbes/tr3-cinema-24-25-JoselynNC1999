@@ -1,9 +1,9 @@
 @component('mail::message')
-# Bienvenido a Cinema Pedralbes
+# Bienvenido a Cinépolis Pedralbes
 
 Hola, {{ $user->name }}.
 
-¡Gracias por registrarte en nuestra plataforma!
+Gràcies per registrar-te a la nostra plataforma!
 
 @component('mail::button', ['url' => url('/')])
 Explorar
