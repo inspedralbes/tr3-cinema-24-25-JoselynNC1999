@@ -315,17 +315,39 @@ const sendEmail = async () => {
     const responseData = await response.json();
 
     if (responseData.message === "Correo enviado con éxito") {
-      alert('Correo enviado con éxito!');
-    } else {
+      showPopup('📩 Correo enviado con éxito!', 'success');
+        } else {
       throw new Error(responseData.message || 'Error desconocido');
     }
   } catch (error) {
     console.error('Error completo:', error);
-    alert(`No se pudo enviar el correo: ${error.message}`);
-  } finally {
+    showPopup(`❌ No se pudo enviar el correo: ${error.message}`, 'error');
+    } finally {
     isSendingEmail.value = false;
   }
 };
+
+function showPopup(message, type = 'info') {
+  let popup = document.createElement("div");
+  popup.innerText = message;
+  popup.style.position = "fixed";
+  popup.style.top = "50%";
+  popup.style.left = "50%";
+  popup.style.transform = "translate(-50%, -50%)";
+  popup.style.background = type === 'success' ? "green" : "red";
+  popup.style.color = "white";
+  popup.style.padding = "15px";
+  popup.style.borderRadius = "5px";
+  popup.style.zIndex = "1000";
+  popup.style.fontSize = "16px";
+  popup.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+  
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 3000);
+}
 
 // Generate a random order code
 const orderCode = ref('CINP' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'));
