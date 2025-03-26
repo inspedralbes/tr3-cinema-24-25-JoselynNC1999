@@ -230,8 +230,8 @@ export const useTheaterStore = defineStore('theater', {
         this.selectedSeats.splice(seatIndex, 1);
       } else {
         if (this.selectedSeats.length >= 10) {
-          alert("No puedes seleccionar más de 10 butacas por sesión");
-          return;
+          this.showPopup("No pots seleccionar més de 10 butaques per sessió");
+      return;
         }
         
         // Buscar el ID del asiento en todos los asientos disponibles
@@ -241,6 +241,27 @@ export const useTheaterStore = defineStore('theater', {
         this.selectedSeats.push({ id: seatId, row, seat, number: seat });
       }
     },
+    
+      showPopup(message) {
+        let popup = document.createElement("div");
+        popup.innerText = message;
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.background = "rgba(0,0,0,0.8)";
+        popup.style.color = "white";
+        popup.style.padding = "15px";
+        popup.style.borderRadius = "5px";
+        popup.style.zIndex = "1000";
+        
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+          popup.remove();
+        }, 3000);
+      },
+          
     
     getAvailableSeatId(row, seat) {
       // Intentar encontrar el asiento usando ambas propiedades

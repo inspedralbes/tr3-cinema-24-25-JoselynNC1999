@@ -1,7 +1,9 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth'; // Importar la store de autenticación
+import { useAuthStore } from '@/stores/auth';
+import TheFooter from '@/components/layout/TheFooter.vue';
+import TheHeader from '@/components/layout/TheHeader.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -47,25 +49,8 @@ const showLogin = () => {
 
 <template>
   <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white flex flex-col">
-    <!-- Header -->
-    <header class="bg-blue-950 shadow-md px-6 py-4">
-      <div class="w-full max-w-7xl mx-auto flex justify-between items-center">
-        <div>
-          <a href="/" class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Mi Aplicación
-          </a>
-        </div>
-        <nav class="hidden md:flex gap-8">
-          <a href="/" class="text-white hover:text-blue-300 transition-colors">Inicio</a>
-          <a href="/features" class="text-white hover:text-blue-300 transition-colors">Características</a>
-          <a href="/about" class="text-white hover:text-blue-300 transition-colors">Acerca de</a>
-          <a href="/contact" class="text-white hover:text-blue-300 transition-colors">Contacto</a>
-        </nav>
-        <button class="md:hidden text-2xl bg-transparent border-none text-white cursor-pointer">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-    </header>
+    <TheHeader />
+
 
     <!-- Main content -->
     <main class="flex-grow flex items-center justify-center p-6 md:p-12 relative">
@@ -79,41 +64,41 @@ const showLogin = () => {
         <div class="absolute -top-4 -left-4 w-16 h-16 bg-purple-400 rounded-full animate-ping opacity-70"></div>
         
         <h2 class="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Crear Cuenta
+          Crear compte
         </h2>
         
         <form @submit.prevent="handleRegister" class="flex flex-col gap-5">
           <div>
-            <label for="name" class="block text-blue-300 mb-2">Nombre completo</label>
+            <label for="name" class="block text-blue-300 mb-2">Nom complet</label>
             <input 
               v-model="user.name"
               type="text" 
               id="name" 
-              placeholder="Tu nombre"
+              placeholder="El teu nom"
               class="w-full px-4 py-3 rounded-full bg-blue-900 border border-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
           </div>
           
           <div>
-            <label for="email" class="block text-blue-300 mb-2">Correo electrónico</label>
+            <label for="email" class="block text-blue-300 mb-2">Correu electrònic</label>
             <input 
               v-model="user.email"
               type="email" 
               id="email" 
-              placeholder="Tu email"
+              placeholder="El teu email"
               class="w-full px-4 py-3 rounded-full bg-blue-900 border border-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
           </div>
           
           <div>
-            <label for="password" class="block text-blue-300 mb-2">Contraseña</label>
+            <label for="password" class="block text-blue-300 mb-2">Contrasenya</label>
             <input 
               v-model="user.password"
               type="password" 
               id="password" 
-              placeholder="Tu contraseña"
+              placeholder="La teva contrasenya"
               class="w-full px-4 py-3 rounded-full bg-blue-900 border border-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
@@ -125,7 +110,7 @@ const showLogin = () => {
               v-model="user.confirmPassword"
               type="password" 
               id="confirmPassword" 
-              placeholder="Confirma tu contraseña"
+              placeholder="Confirma la teva contrasenya"
               class="w-full px-4 py-3 rounded-full bg-blue-900 border border-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
@@ -140,7 +125,7 @@ const showLogin = () => {
               required
             >
             <label for="terms" class="text-blue-300">
-              Acepto los <a href="/terms" class="text-blue-400 hover:text-blue-300">términos y condiciones</a>
+              Accepto els <a href="/terms" class="text-blue-400 hover:text-blue-300">termes i condicions</a>
             </label>
           </div>
           
@@ -152,13 +137,13 @@ const showLogin = () => {
             type="submit"
             class="w-full bg-purple-600 text-white font-semibold py-3 px-8 rounded-full border-none cursor-pointer transition-all hover:bg-purple-700 hover:scale-105 shadow-md mt-2"
           >
-            Crear Cuenta
+          Crear compte
           </button>
         </form>
         
         <div class="mt-6 relative flex items-center justify-center">
           <div class="absolute top-1/2 left-0 right-0 h-px bg-blue-700"></div>
-          <span class="relative px-4 bg-blue-950 text-blue-300">o regístrate con</span>
+          <span class="relative px-4 bg-blue-950 text-blue-300">o registra't amb</span>
         </div>
         
         <div class="mt-6 grid grid-cols-2 gap-3">
@@ -172,21 +157,13 @@ const showLogin = () => {
         </div>
         
         <p class="mt-8 text-center text-blue-300">
-          ¿Ya tienes una cuenta?
+          Ja tens un compte?
           <a @click="showLogin" class="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer font-medium">
-            Inicia sesión
+            Iniciar Sessió
           </a>
         </p>
       </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-blue-950 py-6 border-t border-blue-800">
-      <div class="w-full max-w-7xl mx-auto">
-        <div class="text-center text-blue-400 text-sm">
-          © {{ new Date().getFullYear() }} Mi Aplicación. Todos los derechos reservados.
-        </div>
-      </div>
-    </footer>
+    <TheFooter />
   </div>
 </template>
