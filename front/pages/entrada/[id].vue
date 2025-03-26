@@ -315,7 +315,7 @@ const sendEmail = async () => {
     const responseData = await response.json();
 
     if (responseData.message === "Correo enviado con éxito") {
-      showPopup('📩 Correo enviado con éxito!', 'success');
+      showPopup('📩 Correu enviat amb èxit!', 'success');
         } else {
       throw new Error(responseData.message || 'Error desconocido');
     }

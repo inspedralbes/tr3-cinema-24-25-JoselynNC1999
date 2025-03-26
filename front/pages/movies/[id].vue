@@ -26,7 +26,7 @@
           <p class="text-blue-200 mb-4"><strong>Descripción:</strong> {{ movie.description }}</p>
 
           <div v-if="sessions.length" class="mb-4">
-            <span class="text-blue-300 text-sm font-medium">Sesiones:</span>
+            <span class="text-blue-300 text-sm font-medium">Sessions:</span>
             <ul class="text-blue-200 text-sm">
               <li v-for="(session, index) in sessions" :key="index">
                 🕒 {{ session.date }} - {{ session.time }}

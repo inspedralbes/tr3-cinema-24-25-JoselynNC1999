@@ -28,7 +28,7 @@
 
             <!-- Mostrar sesiones -->
             <div v-if="sessionsForMovie(movie.id).length" class="mb-3">
-              <span class="text-blue-300 text-sm font-medium">Sesiones:</span>
+              <span class="text-blue-300 text-sm font-medium">Sessions:</span>
               <ul class="text-blue-200 text-sm">
                 <li v-for="(session, index) in sessionsForMovie(movie.id)" :key="index">
                   🕒 {{ session.date }} - {{ session.time }}
