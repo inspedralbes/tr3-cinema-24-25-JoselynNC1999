@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
 
+const API_URL = 'http://localhost:8000/api'; // URL base de la API
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: process.client ? localStorage.getItem('token') || null : null,
@@ -18,7 +20,7 @@ export const useAuthStore = defineStore('auth', {
     // Registro de usuario
     async register(user) {
       try {
-        const response = await $fetch('http://127.0.0.1:8000/api/register', {
+        const response = await $fetch(`${API_URL}/register`, {
           method: 'POST',
           body: user,
         });
@@ -43,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
     // Login de usuario
     async login(credentials) {
       try {
-        const response = await $fetch('http://127.0.0.1:8000/api/login', {
+        const response = await $fetch(`${API_URL}/login`, {
           method: 'POST',
           body: credentials,
         });
@@ -59,9 +61,8 @@ export const useAuthStore = defineStore('auth', {
         // Convertir la cadena JSON de 'user' en un objeto JavaScript
         const user = JSON.parse(localStorage.getItem('user'));
 
-        // Ahora puedes trabajar con el objeto 'user'
-        console.log(user); // Deberías ver el objeto como un objeto normal y no como una cadena JSON
-        console.log(user.name); // Acceder a propiedades del objeto
+        console.log(user);
+        console.log(user.name);
 
         console.log('✅ Usuario autenticado:', this.user);
         console.log('🔑 Token guardado:', this.token);
@@ -80,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
     // Logout de usuario
     async logout() {
       try {
-        await $fetch('http://127.0.0.1:8000/api/logout', {
+        await $fetch(`${API_URL}/logout`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
         });
@@ -115,7 +116,7 @@ export const useAuthStore = defineStore('auth', {
           reservationData.email = this.user.email;
         }
 
-        const response = await $fetch('http://localhost:8000/api/send-ticket-email', {
+        const response = await $fetch(`${API_URL}/send-ticket-email`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -132,8 +133,6 @@ export const useAuthStore = defineStore('auth', {
         throw error;
       }
     },
-
-    // Selección de película
     selectMovie(movie) {
       console.log('Película seleccionada:', movie);
       this.selectedMovie = movie;  // Solo modificar el valor en el store de auth
@@ -155,10 +154,9 @@ export const useAuthStore = defineStore('auth', {
       const theaterStore = useTheaterStore();
       theaterStore.selectedSeats = seats;  // Sincronizar con theaterStore
     },
-
     async fetchUsers() {
       try {
-        const response = await $fetch('http://127.0.0.1:8000/api/users', {
+        const response = await $fetch(`${API_URL}/users`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -172,7 +170,7 @@ export const useAuthStore = defineStore('auth', {
             id: user.id,
             name: user.name,
             email: user.email,
-            status: 'Actiu', // Puedes cambiar esto si tienes un campo de estado en la API
+            status: 'Actiu',
             statusClass: 'status-active'
           }));
         }
@@ -182,7 +180,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Realizar compra de entradas
     async purchaseTickets() {
       if (!this.user) {
         alert('Debes iniciar sesión para comprar entradas.');
@@ -194,8 +191,9 @@ export const useAuthStore = defineStore('auth', {
         return;
       }
 
+    
       try {
-        const response = await $fetch('http://127.0.0.1:8000/api/purchase', {
+        const response = await $fetch(`${API_URL}/purchase`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
           body: {
