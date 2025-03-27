@@ -2,6 +2,9 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './auth'; 
 
+// Define base API URL directly
+const BASE_API_URL = 'http://127.0.0.1:8000/api';
+
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
     rowLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'],
@@ -17,16 +20,16 @@ export const useTheaterStore = defineStore('theater', {
 
     isDiscountDay: false,
 
-    currentMovie: null, // Se cargará dinámicamente
-    currentSession: null, // Se cargará dinámicamente
-    occupiedSeats: [], // Se cargará dinámicamente
+    currentMovie: null,
+    currentSession: null,
+    occupiedSeats: [],
     selectedSeats: [],
     allSeats: []
   }),
 
   getters: {
     getPricePerSeat: (state) => (row) => {
-      if (!row) return 0; // Evita valores undefined
+      if (!row) return 0;
       const isVip = row === state.vipRow;
       return isVip
         ? (state.isDiscountDay ? state.prices.discountVip : state.prices.vip)
@@ -50,19 +53,17 @@ export const useTheaterStore = defineStore('theater', {
     isVipSeat: (state) => (row) => row === state.vipRow,
 
     getSeatClass: (state) => (row, seat) => {
-      if (state.isSeatOccupied(row, seat)) return 'bg-red-500 cursor-not-allowed'; // Ocupado (Rojo)
-      if (state.isSeatSelected(row, seat)) return 'bg-green-500'; // Seleccionado (Verde)
-      if (state.isVipSeat(row)) return 'bg-purple-500'; // VIP (Morado)
-      return 'bg-gray-500'; // Disponible (Gris)
+      if (state.isSeatOccupied(row, seat)) return 'bg-red-500 cursor-not-allowed';
+      if (state.isSeatSelected(row, seat)) return 'bg-green-500';
+      if (state.isVipSeat(row)) return 'bg-purple-500';
+      return 'bg-gray-500';
     },
-    
   },
 
   actions: {
-
     async fetchSeats(sessionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/seats`);
+        const response = await fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`);
         if (!response.ok) throw new Error('Error al obtener los asientos');
     
         let seats = await response.json();
@@ -72,7 +73,6 @@ export const useTheaterStore = defineStore('theater', {
     
         this.allSeats = seats;
         
-        // ✅ Llamar a `fetchOccupiedSeats` directamente después de cargar todos los asientos
         await this.fetchOccupiedSeats(sessionId);
         
       } catch (error) {
@@ -83,7 +83,7 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieById(movieId) {
       try {
         console.log(`Fetching movie with ID: ${movieId}`);
-        const response = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}`);
+        const response = await fetch(`${BASE_API_URL}/movies/${movieId}`);
         if (!response.ok) throw new Error('Error al obtener la película');
         const data = await response.json();
         console.log('Movie fetched:', data);
@@ -96,17 +96,15 @@ export const useTheaterStore = defineStore('theater', {
     async fetchSessionByMovieId(movieId) {
       try {
         console.log(`Fetching session for movie ID: ${movieId}`);
-        const response = await fetch(`http://127.0.0.1:8000/api/sessions?movieId=${movieId}`);
+        const response = await fetch(`${BASE_API_URL}/sessions?movieId=${movieId}`);
         
         if (!response.ok) throw new Error('Error al obtener la sesión');
         
         const sessions = await response.json();
         console.log('Sessions fetched:', sessions);
         
-        // Asigna la primera sesión disponible (o null si no hay sesiones)
         this.currentSession = sessions.length ? sessions[0] : null;
         
-        // Si hay sesión, se obtienen los asientos ocupados
         if (this.currentSession) {
           await this.fetchOccupiedSeats(this.currentSession.id);
         }
@@ -118,14 +116,14 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieDetails(movieId) {
       try {
         console.log(`Fetching movie details for movie ID: ${movieId}`);
-        const response = await fetch(`http://127.0.0.1:8000/api/movies/${movieId}`);
+        const response = await fetch(`${BASE_API_URL}/movies/${movieId}`);
         
         if (!response.ok) throw new Error('Error al obtener la película');
         
         const movie = await response.json();
         console.log('Movie details fetched:', movie);
         
-        this.movieDetails = movie; // Guarda los detalles de la película en una propiedad de tu estado
+        this.movieDetails = movie;
       } catch (error) {
         console.error('Error en fetchMovieDetails:', error);
       }
@@ -133,7 +131,7 @@ export const useTheaterStore = defineStore('theater', {
     
     async fetchOccupiedSeats(sessionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/sessions/${sessionId}/occupied-seats`);
+        const response = await fetch(`${BASE_API_URL}/sessions/${sessionId}/occupied-seats`);
         if (!response.ok) throw new Error("Error al obtener asientos ocupados");
     
         let seats = await response.json();
@@ -151,7 +149,6 @@ export const useTheaterStore = defineStore('theater', {
         console.log("Asientos ocupados actualizados:", this.occupiedSeats);
       } catch (error) {
         console.error("Error en fetchOccupiedSeats:", error);
-        // 🔥 NO limpiar `occupiedSeats` aquí para evitar que desaparezcan visualmente
       }
     },
     
@@ -173,6 +170,7 @@ export const useTheaterStore = defineStore('theater', {
         console.warn('No movie found with this ID.');
       }
     },
+
     async reserveSeats() {
       if (!this.selectedSeats.length) {
         alert("Debes seleccionar al menos una butaca");
@@ -194,7 +192,7 @@ export const useTheaterStore = defineStore('theater', {
     
         console.log("Reservando asientos con IDs:", seatIds);
     
-        const response = await fetch("http://127.0.0.1:8000/api/reserve-seats", {
+        const response = await fetch(`${BASE_API_URL}/reserve-seats`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -218,7 +216,6 @@ export const useTheaterStore = defineStore('theater', {
     toggleSeat(row, seat) {
       console.log(`Clic en asiento: ${row}${seat}`);
     
-      // Usar el getter para comprobar si está ocupado
       if (this.isSeatOccupied(row, seat)) {
         console.warn(`El asiento ${row}${seat} ya está ocupado!`);
         return;
@@ -231,10 +228,9 @@ export const useTheaterStore = defineStore('theater', {
       } else {
         if (this.selectedSeats.length >= 10) {
           this.showPopup("No pots seleccionar més de 10 butaques per sessió");
-      return;
+          return;
         }
         
-        // Buscar el ID del asiento en todos los asientos disponibles
         const seatId = this.getAvailableSeatId(row, seat);
         
         console.log(`Selecting seat: ${row}${seat} with ID: ${seatId}`);
@@ -242,29 +238,27 @@ export const useTheaterStore = defineStore('theater', {
       }
     },
     
-      showPopup(message) {
-        let popup = document.createElement("div");
-        popup.innerText = message;
-        popup.style.position = "fixed";
-        popup.style.top = "50%";
-        popup.style.left = "50%";
-        popup.style.transform = "translate(-50%, -50%)";
-        popup.style.background = "rgba(0,0,0,0.8)";
-        popup.style.color = "white";
-        popup.style.padding = "15px";
-        popup.style.borderRadius = "5px";
-        popup.style.zIndex = "1000";
-        
-        document.body.appendChild(popup);
+    showPopup(message) {
+      let popup = document.createElement("div");
+      popup.innerText = message;
+      popup.style.position = "fixed";
+      popup.style.top = "50%";
+      popup.style.left = "50%";
+      popup.style.transform = "translate(-50%, -50%)";
+      popup.style.background = "rgba(0,0,0,0.8)";
+      popup.style.color = "white";
+      popup.style.padding = "15px";
+      popup.style.borderRadius = "5px";
+      popup.style.zIndex = "1000";
+      
+      document.body.appendChild(popup);
 
-        setTimeout(() => {
-          popup.remove();
-        }, 3000);
-      },
-          
-    
+      setTimeout(() => {
+        popup.remove();
+      }, 3000);
+    },
+        
     getAvailableSeatId(row, seat) {
-      // Intentar encontrar el asiento usando ambas propiedades
       const availableSeat = this.allSeats?.find(s => 
         s.row === row && (s.number == seat || s.seat == seat)
       );
