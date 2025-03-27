@@ -1,39 +1,39 @@
 <template>
   <div class="admin-layout">
-    <!-- Sidebar -->
+    <!-- Barra lateral -->
     <slideBar />
 
-    <!-- Main Content -->
+    <!-- Contingut principal -->
     <div class="main-content">
-      <h2>Lista de Sesiones</h2>
+      <h2>Llista de Sessions</h2>
 
       <table>
         <thead>
           <tr>
-            <th>Película</th>
-            <th>Fecha</th>
-            <th>Hora Inicio</th>
-            <th>Duración</th>
-            <th>Ocupación</th>
-            <th>Acciones</th>
+            <th>Pel·lícula</th>
+            <th>Data</th>
+            <th>Hora d'Inici</th>
+            <th>Durada</th>
+            <th>Ocupació</th>
+            <th>Accions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="session in sessions" :key="session.id">
-            <td>{{ session.movie?.title || 'Película desconocida' }}</td>
+            <td>{{ session.movie?.title || 'Pel·lícula desconeguda' }}</td>
             <td>{{ formatDate(session.date) }}</td>
             <td>{{ formatTime(session.time) }}</td>
-            <td>{{ session.movie?.duration ? session.movie.duration + ' min' : 'Desconocida' }}</td>
-            <td>54%</td> <!-- Puedes cambiarlo si tienes datos reales de ocupación -->
+            <td>{{ session.movie?.duration ? session.movie.duration + ' min' : 'Desconeguda' }}</td>
+            <td>54%</td> <!-- Ajusta segons dades reals -->
             <td>
               <button class="action-button" @click="editSession(session)">Editar</button>
-              <button class="action-button" @click="viewDetails(session)">Detalles</button>
+              <button class="action-button" @click="viewDetails(session)">Detalls</button>
             </td>
           </tr>
         </tbody>
       </table>
 
-      <p v-if="loading">Cargando sesiones...</p>
+      <p v-if="loading">Carregant sessions...</p>
       <p v-if="error" class="error">{{ error }}</p>
     </div>
   </div>
@@ -52,18 +52,18 @@ onMounted(() => {
 })
 
 const formatDate = (date) => {
-  if (!date) return 'Fecha no disponible'
-  return new Date(date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+  if (!date) return 'Data no disponible'
+  return new Date(date).toLocaleDateString('ca-ES', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 const formatTime = (time) => time || 'Hora no disponible'
 
 const editSession = (session) => {
-  console.log('Editar sesión:', session)
+  console.log('Editar sessió:', session)
 }
 
 const viewDetails = (session) => {
-  console.log('Ver detalles de sesión:', session)
+  console.log('Veure detalls de la sessió:', session)
 }
 </script>
 
@@ -71,13 +71,6 @@ const viewDetails = (session) => {
 .admin-layout {
   display: flex;
   height: 100vh;
-}
-
-.sidebar {
-  width: 250px;
-  background-color: #0a4b96;
-  color: white;
-  padding: 20px;
 }
 
 .main-content {
@@ -88,22 +81,29 @@ const viewDetails = (session) => {
 
 h2 {
   margin-bottom: 15px;
+  color: #0a4b96;
+  border-bottom: 2px solid #0a4b96;
+  padding-bottom: 10px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 12px;
   text-align: left;
 }
 
 th {
-  background-color: #f4f4f4;
+  background-color: #0a4b96;
+  color: white;
 }
 
 .action-button {
@@ -114,6 +114,10 @@ th {
   border-radius: 5px;
   cursor: pointer;
   margin-right: 5px;
+}
+
+.action-button:hover {
+  background-color: #083b75;
 }
 
 .error {

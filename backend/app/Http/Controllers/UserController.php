@@ -10,12 +10,11 @@ use Illuminate\Validation\ValidationException;
 class UserController extends Controller
 {
     // Listar todos los usuarios
-    public function index()
-    {
-        $users = User::all();
-        return view('users', compact('users'));
-    }
-
+            public function index()
+        {
+            $users = User::all();
+            return response()->json($users); 
+        }
     // Crear un nuevo usuario
     public function store(Request $request)
     {
@@ -62,8 +61,10 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users')->with('success', 'Usuario actualizado exitosamente');
-    }
+        return response()->json([
+            'message' => 'Usuario actualizado exitosamente',
+            'user' => $user
+        ]);    }
 
     // Eliminar un usuario
     public function destroy(User $user)

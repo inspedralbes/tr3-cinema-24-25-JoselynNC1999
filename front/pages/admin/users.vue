@@ -1,18 +1,46 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import slideBar from '@/components/layout/slideBar';
 
-// Datos de usuarios simulados
-const users = ref([
-  { name: 'Joan Pérez García', email: 'joan.perez@email.com', dni: '12345678A', registrationDate: '01/01/2025', phone: '+34 666 123 456', status: 'Actiu', statusClass: 'status-active' },
-  { name: 'Maria García López', email: 'maria.garcia@email.com', dni: '87654321B', registrationDate: '15/02/2025', phone: '+34 777 234 567', status: 'Inactiu', statusClass: 'status-inactive' },
-  { name: 'Lluís Martínez Pons', email: 'lluis.martinez@email.com', dni: '56781234C', registrationDate: '10/03/2025', phone: '+34 888 345 678', status: 'Pendent', statusClass: 'status-pending' },
-]);
+// Datos de usuarios simulados (se reemplazarán con los de la API)
+const users = ref([]);
 
 const statusFilter = ref('Tots els estatus');
 const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 5;
+
+// Función para obtener usuarios desde una API
+const fetchUsers = async () => {
+  try {
+    const token = localStorage.getItem('token');  // Asegúrate de tener el token en el localStorage o en otro lugar seguro
+    const response = await fetch('http://127.0.0.1:8000/api/users', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,  // Añades el token aquí
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      users.value = data.map(user => ({
+        id: user.id,  // Tomamos el ID
+        name: user.name,  // Tomamos el nombre
+        email: user.email,  // Tomamos el correo
+        status: 'Actiu',  // Cambiamos el estado a "Actiu" para todos
+        statusClass: 'status-active'  // La clase para el estado "Actiu"
+      }));
+    } else {
+      console.error('Error al obtener los usuarios:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error al obtener los usuarios:', error);
+  }
+};
+
+// Llamar a la API cuando se monte el componente
+onMounted(fetchUsers);
 
 const filteredUsers = computed(() => {
   let filtered = users.value;
@@ -25,7 +53,7 @@ const filteredUsers = computed(() => {
     filtered = filtered.filter(user =>
       user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      user.dni.toLowerCase().includes(searchQuery.value.toLowerCase())
+      user.dni?.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
   }
 
@@ -75,23 +103,22 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
         <table>
           <thead>
             <tr>
+              <th>ID</th>
               <th>Nom</th>
               <th>Correu Electrònic</th>
-              <th>DNI</th>
-              <th>Data de Registre</th>
-              <th>Telèfon</th>
-              <th>Estatus</th>
+              <th>Estat</th> <!-- Nueva columna "Estat" -->
               <th>Accions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in filteredUsers" :key="user.dni">
+            <tr v-for="user in filteredUsers" :key="user.id">
+              <td>{{ user.id }}</td>
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
-              <td>{{ user.dni }}</td>
-              <td>{{ user.registrationDate }}</td>
-              <td>{{ user.phone }}</td>
-              <td><span :class="['user-status', user.statusClass]">{{ user.status }}</span></td>
+              <td>
+                <!-- Columna para mostrar el estado -->
+                <span :class="user.statusClass">{{ user.status }}</span>
+              </td>
               <td>
                 <div class="user-actions">
                   <button class="action-button" @click="editUser(user)">Editar</button>
@@ -112,12 +139,10 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
   </div>
 </template>
 
-  
-  <style scoped>
+<style scoped>
   /* Estilos comunes */
   * {
     margin: 0;
-    padding: 0;
     box-sizing: border-box;
   }
   
@@ -242,8 +267,7 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
   }
   
   .status-active {
-    background-color: #4CAF50;
-    color: white;
+    color: black;
   }
   
   .status-inactive {
@@ -291,5 +315,4 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
   .pagination-info {
     color: #666;
   }
-  </style>
-  
+</style>

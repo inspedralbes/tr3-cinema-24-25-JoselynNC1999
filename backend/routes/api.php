@@ -52,3 +52,19 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 Route::get('/dates', [SessionMovieController::class, 'getDates']);
 
+// Obtener todos los usuarios
+Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+
+// Crear un nuevo usuario
+Route::middleware('auth:sanctum')->post('/users', [UserController::class, 'store']);
+
+// Obtener un usuario específico
+Route::middleware('auth:sanctum')->get('/users/{user}', [UserController::class, 'show']);
+
+// Actualizar un usuario
+Route::middleware('auth:sanctum')->put('/users/{user}', [UserController::class, 'update']);
+
+// Eliminar un usuario
+Route::middleware('auth:sanctum')->delete('/users/{user}', [UserController::class, 'destroy']);
+
+
