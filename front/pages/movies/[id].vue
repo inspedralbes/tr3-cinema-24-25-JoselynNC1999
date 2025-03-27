@@ -22,7 +22,7 @@
         <div class="md:col-span-2">
           <h1 class="text-3xl font-bold mb-4">{{ movie.title }}</h1>
           <p class="text-blue-200 mb-2"><strong>Duración:</strong> {{ movie.duration }} min</p>
-          <p class="text-blue-200 mb-2"><strong>Clasificación:</strong> {{ movie.ageRating || 'Muy Rocomendada' }}</p>
+          <p class="text-blue-200 mb-2"><strong>Clasificación:</strong> {{ movie.ageRating || 'Molt recomanada' }}</p>
           <p class="text-blue-200 mb-4"><strong>Descripción:</strong> {{ movie.description }}</p>
 
           <div v-if="sessions.length" class="mb-4">

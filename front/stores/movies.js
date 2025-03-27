@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+const API_URL = 'http://localhost:8000/api' // URL base de la API
+
 export const useMovieStore = defineStore('movies', () => {
   // State
   const movies = ref([])
@@ -11,41 +13,48 @@ export const useMovieStore = defineStore('movies', () => {
   const loading = ref(false)
   const error = ref(null)
 
-  // ✅ Cargar todas las películas (con paginación)
-  const fetchMovies = async (page = 1) => {
+  // Función genérica para realizar fetch
+  const fetchData = async (endpoint, targetRef, transform = null) => {
     try {
       loading.value = true
       error.value = null
 
-      const response = await fetch(`http://localhost:8000/api/movies?page=${page}`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/${endpoint}`, {
+        method: 'GET',
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       })
 
       if (!response.ok) throw new Error(`Error en la API (${response.status})`)
       const data = await response.json()
 
-      movies.value = data.map(movie => ({
+      targetRef.value = transform ? transform(data) : data
+    } catch (err) {
+      error.value = `Error al cargar ${endpoint}. Inténtalo más tarde.`
+      console.error(`Error al cargar ${endpoint}:`, err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ✅ Cargar todas las películas (con paginación)
+  const fetchMovies = async (page = 1) => {
+    await fetchData(`movies?page=${page}`, movies, (data) => {
+      const processedMovies = data.map(movie => ({
         ...movie,
         poster_url: movie.poster_url || 'https://via.placeholder.com/300x450?text=No+Image'
       }))
 
-      featuredMovies.value = movies.value.filter(movie => movie.badge === 'ESTRENA')
-      regularMovies.value = movies.value.filter(movie => !movie.badge || movie.badge !== 'ESTRENA')
+      featuredMovies.value = processedMovies.filter(movie => movie.badge === 'ESTRENA')
+      regularMovies.value = processedMovies.filter(movie => !movie.badge || movie.badge !== 'ESTRENA')
 
-      // Si la API devuelve metadatos de paginación
       if (data.meta) {
         totalPages.value = data.meta.last_page
         currentPage.value = data.meta.current_page
       }
-    } catch (err) {
-      error.value = 'Error al cargar las películas. Inténtalo más tarde.'
-      console.error('Error en fetchMovies:', err)
-    } finally {
-      loading.value = false
-    }
+      return processedMovies
+    })
   }
 
   // ✅ Obtener película desde el store (si ya ha sido cargada)
@@ -59,17 +68,16 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await fetch(`http://localhost:8000/api/movies/${id}`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/movies/${id}`, {
+        method: 'GET',
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       })
 
       if (!response.ok) throw new Error(`Error en la API (${response.status})`)
       const movie = await response.json()
 
-      // Agregar la película al store si no estaba
       if (!getMovieById(id)) {
         movies.value.push(movie)
       }
