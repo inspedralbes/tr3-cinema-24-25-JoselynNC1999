@@ -62,8 +62,8 @@
     buttons: {
       type: Array,
       default: () => [
-        { text: 'Veure cartellera', url: '#', primary: true },
-        { text: 'Comprar entrades', url: '#', primary: false }
+        { text: 'Veure cartellera', url: '/cartellera', primary: true },
+        { text: 'Comprar entrades', url: '/cartellera', primary: false }
       ]
     }
   })
