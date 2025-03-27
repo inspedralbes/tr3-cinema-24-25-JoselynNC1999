@@ -1,144 +1,117 @@
+<script setup>
+import { ref, computed } from 'vue';
+import slideBar from '@/components/layout/slideBar';
+
+// Datos de usuarios simulados
+const users = ref([
+  { name: 'Joan Pérez García', email: 'joan.perez@email.com', dni: '12345678A', registrationDate: '01/01/2025', phone: '+34 666 123 456', status: 'Actiu', statusClass: 'status-active' },
+  { name: 'Maria García López', email: 'maria.garcia@email.com', dni: '87654321B', registrationDate: '15/02/2025', phone: '+34 777 234 567', status: 'Inactiu', statusClass: 'status-inactive' },
+  { name: 'Lluís Martínez Pons', email: 'lluis.martinez@email.com', dni: '56781234C', registrationDate: '10/03/2025', phone: '+34 888 345 678', status: 'Pendent', statusClass: 'status-pending' },
+]);
+
+const statusFilter = ref('Tots els estatus');
+const searchQuery = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
+const filteredUsers = computed(() => {
+  let filtered = users.value;
+
+  if (statusFilter.value !== 'Tots els estatus') {
+    filtered = filtered.filter(user => user.status === statusFilter.value);
+  }
+
+  if (searchQuery.value) {
+    filtered = filtered.filter(user =>
+      user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.dni.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+  }
+
+  return filtered.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
+});
+
+const totalPages = computed(() => Math.ceil(users.value.length / itemsPerPage));
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const createUser = () => console.log('Crear nou usuari');
+const editUser = (user) => console.log('Editar usuari', user);
+const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
+</script>
+
 <template>
-    <div class="admin-layout">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div class="sidebar-logo">CINÉPOLIS PEDRALBES</div>
-        <ul class="sidebar-menu">
-          <li><NuxtLink to="/admin" class="block p-3 rounded">Dashboard</NuxtLink></li>
-          <li><NuxtLink to="/admin/sessions" class="block p-3 rounded">Gestió de Sessions</NuxtLink></li>
-          <li><NuxtLink to="/admin/movies" class="block p-3 rounded">Pel·lícules</NuxtLink></li>
-          <li><NuxtLink to="/admin/tickets" class="block p-3 rounded">Entrades</NuxtLink></li>
-          <li><NuxtLink to="/admin/users" class="block p-3 rounded  active">Usuaris</NuxtLink></li>
-          <li><NuxtLink to="/admin/settings" class="block p-3 rounded">Configuració</NuxtLink></li>
-        </ul>
+  <div class="admin-layout">
+    <slideBar />
+
+    <div class="main-content">
+      <div class="header">
+        <div class="header-title">Gestió d'Usuaris</div>
+        <button class="button-primary" @click="createUser">Nou Usuari</button>
       </div>
-  
-      <!-- Main Content -->
-      <div class="main-content">
-        <div class="header">
-          <div class="header-title">Gestió d'Usuaris</div>
-          <button class="button-primary" @click="createUser">Nou Usuari</button>
-        </div>
-  
-        <!-- Filter and Table -->
-        <div class="filter-bar">
-          <select v-model="statusFilter">
-            <option>Tots els estatus</option>
-            <option>Actiu</option>
-            <option>Inactiu</option>
-            <option>Pendent</option>
-          </select>
-          <input v-model="searchQuery" type="text" placeholder="Cerca per nom, correu o DNI" />
-          <button class="button-primary" @click="filterUsers">Filtrar</button>
-        </div>
-  
-        <div class="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Correu Electrònic</th>
-                <th>DNI</th>
-                <th>Data de Registre</th>
-                <th>Telèfon</th>
-                <th>Estatus</th>
-                <th>Accions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in filteredUsers" :key="user.dni">
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.dni }}</td>
-                <td>{{ user.registrationDate }}</td>
-                <td>{{ user.phone }}</td>
-                <td>
-                  <span :class="['user-status', user.statusClass]">{{ user.status }}</span>
-                </td>
-                <td>
-                  <div class="user-actions">
-                    <button class="action-button" @click="editUser(user)">Editar</button>
-                    <button class="action-button" @click="viewDetails(user)">Detalls</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-  
-        <!-- Pagination -->
-        <div class="pagination">
-          <button @click="prevPage">Anterior</button>
-          <span class="pagination-info">Pàgina {{ currentPage }} de {{ totalPages }}</span>
-          <button @click="nextPage">Següent</button>
-        </div>
+
+      <div class="filter-bar">
+        <select v-model="statusFilter">
+          <option>Tots els estatus</option>
+          <option>Actiu</option>
+          <option>Inactiu</option>
+          <option>Pendent</option>
+        </select>
+        <input v-model="searchQuery" type="text" placeholder="Cerca per nom, correu o DNI" />
+      </div>
+
+      <div class="users-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Correu Electrònic</th>
+              <th>DNI</th>
+              <th>Data de Registre</th>
+              <th>Telèfon</th>
+              <th>Estatus</th>
+              <th>Accions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in filteredUsers" :key="user.dni">
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.dni }}</td>
+              <td>{{ user.registrationDate }}</td>
+              <td>{{ user.phone }}</td>
+              <td><span :class="['user-status', user.statusClass]">{{ user.status }}</span></td>
+              <td>
+                <div class="user-actions">
+                  <button class="action-button" @click="editUser(user)">Editar</button>
+                  <button class="action-button" @click="viewDetails(user)">Detalls</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button @click="prevPage">Anterior</button>
+        <span class="pagination-info">Pàgina {{ currentPage }} de {{ totalPages }}</span>
+        <button @click="nextPage">Següent</button>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        users: [
-          { name: "Joan Pérez García", email: "joan.perez@email.com", dni: "12345678A", registrationDate: "01/01/2025", phone: "+34 666 123 456", status: "Actiu", statusClass: "status-active" },
-          { name: "Maria García López", email: "maria.garcia@email.com", dni: "87654321B", registrationDate: "15/02/2025", phone: "+34 777 234 567", status: "Inactiu", statusClass: "status-inactive" },
-          { name: "Lluís Martínez Pons", email: "lluis.martinez@email.com", dni: "56781234C", registrationDate: "10/03/2025", phone: "+34 888 345 678", status: "Pendent", statusClass: "status-pending" },
-        ],
-        statusFilter: "Tots els estatus",
-        searchQuery: "",
-        currentPage: 1,
-        itemsPerPage: 5,
-      };
-    },
-    computed: {
-      filteredUsers() {
-        let filtered = this.users;
-  
-        if (this.statusFilter !== "Tots els estatus") {
-          filtered = filtered.filter(user => user.status === this.statusFilter);
-        }
-  
-        if (this.searchQuery) {
-          filtered = filtered.filter(user =>
-            user.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            user.dni.toLowerCase().includes(this.searchQuery.toLowerCase())
-          );
-        }
-  
-        return filtered.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage);
-      },
-      totalPages() {
-        return Math.ceil(this.users.length / this.itemsPerPage);
-      }
-    },
-    methods: {
-      filterUsers() {
-        this.currentPage = 1;
-      },
-      createUser() {
-        console.log("Crear nou usuari");
-      },
-      editUser(user) {
-        console.log("Editar usuari", user);
-      },
-      viewDetails(user) {
-        console.log("Veure detalls de l'usuari", user);
-      },
-      prevPage() {
-        if (this.currentPage > 1) {
-          this.currentPage--;
-        }
-      },
-      nextPage() {
-        if (this.currentPage < this.totalPages) {
-          this.currentPage++;
-        }
-      }
-    }
-  };
-  </script>
+  </div>
+</template>
+
   
   <style scoped>
   /* Estilos comunes */

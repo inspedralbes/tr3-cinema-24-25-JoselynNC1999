@@ -5,19 +5,7 @@
 
   <div v-else-if="isAuthorized" class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-blue-900 text-white p-5">
-      <div class="text-2xl font-bold text-center mb-6">CINÉPOLIS PEDRALBES</div>
-      <ul class="space-y-2">
-        <li><NuxtLink to="/admin" class="block p-3 rounded bg-white bg-opacity-20">Dashboard</NuxtLink></li>
-        <li><NuxtLink to="/admin/sessions" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Gestió de Sessions</NuxtLink></li>
-        <li><NuxtLink to="/admin/movies" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Pel·lícules</NuxtLink></li>
-        <li><NuxtLink to="/admin/reserves" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Reserves</NuxtLink></li>
-        <li><NuxtLink to="/admin/users" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Usuaris</NuxtLink></li>
-        <li><NuxtLink to="/admin/ocupacio" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Ocupació</NuxtLink></li>
-        <li><NuxtLink to="/admin/Reportes" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Reportes</NuxtLink></li>
-        <li><NuxtLink to="/admin/settings" class="block p-3 rounded hover:bg-white hover:bg-opacity-20">Configuració</NuxtLink></li>
-      </ul>
-    </aside>
+    <slideBar />
 
     <!-- Main Content -->
     <main class="flex-1 p-6 bg-gray-100 overflow-y-auto">
@@ -26,8 +14,8 @@
         <button class="bg-blue-900 text-white px-4 py-2 rounded">Informe Setmanal</button>
       </header>
 
-      <!-- Dashboard Grid -->
-      <div class="grid grid-cols-2 gap-6">
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-2 gap-6">
         <!-- Resumen de ventas -->
         <div class="bg-white p-6 rounded shadow">
           <div class="flex justify-between items-center mb-4">
@@ -66,42 +54,30 @@
             <button class="bg-blue-900 text-white px-4 py-2 rounded">Veure Totes</button>
           </div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-lg font-bold">Interstellar</p>
-              <p class="text-sm text-gray-600">305 Entrades</p>
-            </div>
-            <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-lg font-bold">Dune</p>
-              <p class="text-sm text-gray-600">276 Entrades</p>
-            </div>
-            <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-lg font-bold">Avatar</p>
-              <p class="text-sm text-gray-600">248 Entrades</p>
-            </div>
-            <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-lg font-bold">Oppenheimer</p>
-              <p class="text-sm text-gray-600">221 Entrades</p>
+            <div v-for="(movie, index) in popularMovies" :key="index" class="p-4 bg-gray-200 text-center rounded">
+              <p class="text-lg font-bold">{{ movie.title }}</p>
+              <p class="text-sm text-gray-600">{{ movie.ticketsSold }} Entrades</p>
             </div>
           </div>
         </div>
 
-        <!-- Estado de sesiones -->
-        <div class="bg-white p-6 rounded shadow">
+         <!-- Estado de sesiones -->
+         <div class="bg-white p-6 rounded shadow">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold">Estat de Sessions</h2>
             <button class="bg-blue-900 text-white px-4 py-2 rounded">Gestionar</button>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-xl font-bold text-blue-900">42</p>
+              <p class="text-xl font-bold text-blue-900">12</p>
               <p class="text-sm text-gray-600">Sessions Programades</p>
             </div>
             <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-xl font-bold text-blue-900">35</p>
+              <p class="text-xl font-bold text-blue-900">1</p>
               <p class="text-sm text-gray-600">Sessions Avui</p>
             </div>
             <div class="p-4 bg-gray-200 text-center rounded">
-              <p class="text-xl font-bold text-blue-900">7</p>
+              <p class="text-xl font-bold text-blue-900">0</p>
               <p class="text-sm text-gray-600">Sessions Cancel·lades</p>
             </div>
             <div class="p-4 bg-gray-200 text-center rounded">
@@ -116,13 +92,19 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import slideBar from '@/components/layout/slideBar' 
+import { useSessionStore } from '@/stores/sessions'
 import { useAuthStore } from '@/stores/auth'
-import { ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 import { toRaw } from 'vue'
+
+
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const sessionStore = useSessionStore()
+
 const isLoading = ref(true)
 const isAuthorized = ref(false)
 
@@ -137,8 +119,21 @@ watchEffect(() => {
   } else {
     isAuthorized.value = true
   }
+})
+const popularMovies = ref([])
 
-  // Desactivar el cargador
+onMounted(async () => {
+  await sessionStore.fetchAllSessions() // Cargamos todas las sesiones
+  // Filtramos las 4 películas más populares
+  const sortedSessions = sessionStore.sessions
+    .map(session => ({
+      title: session.movie.title, // Suponiendo que cada sesión tiene un campo movie con un campo title
+      ticketsSold: session.tickets_sold // Suponiendo que cada sesión tiene un campo tickets_sold
+    }))
+    .sort((a, b) => b.ticketsSold - a.ticketsSold) // Ordenamos de mayor a menor
+    .slice(0, 4) // Tomamos solo las 4 primeras
+  
+  popularMovies.value = sortedSessions
   isLoading.value = false
 })
 </script>
