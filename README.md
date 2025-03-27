@@ -1,4 +1,4 @@
-# 🎥 **Cinépolis Pedralbes - Cinema**  
+# 🎥 **Cinépolis Pedralbes **  
 
 📍 *Gestió de cinema intel·ligent i reserves en línia*  
 
@@ -41,9 +41,9 @@ Les següents funcionalitats ja han estat implementades:
 | 🚀 **Laravel** | Backend robust i escalable |
 | 🗄️ **MySQL** | Gestió de dades |
 | 🐳 **Docker** | Contenidors per al desplegament |
-| 🖥️ **Node.js** | Execució d'scripts i serveis |
+| 🎨 **Tailwind CSS** | Estilització moderna i eficient |
+| 📦 **Pinia** | Gestió de l'estat de l'aplicació |
 
----
 
 ## 🌐 **Accés al projecte**  
 
