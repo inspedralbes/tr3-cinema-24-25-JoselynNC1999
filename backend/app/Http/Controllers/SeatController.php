@@ -14,8 +14,9 @@ class SeatController extends Controller
     // Listar todas las butacas
     public function index()
     {
-        $seats = Seat::all();
-        return response()->json($seats);
+        return response()->json([
+            'data' => Seat::all()
+        ]);
     }
 
     // Guardar una nueva butaca
