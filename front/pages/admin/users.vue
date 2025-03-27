@@ -1,41 +1,21 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth'; // Importamos el store de autenticación
 import slideBar from '@/components/layout/slideBar';
 
-// Datos de usuarios simulados (se reemplazarán con los de la API)
+const authStore = useAuthStore(); // Instancia del store
 const users = ref([]);
-
 const statusFilter = ref('Tots els estatus');
 const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 5;
 
-// Función para obtener usuarios desde una API
+// Función para obtener usuarios desde Pinia
 const fetchUsers = async () => {
   try {
-    const token = localStorage.getItem('token');  // Asegúrate de tener el token en el localStorage o en otro lugar seguro
-    const response = await fetch('http://127.0.0.1:8000/api/users', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,  // Añades el token aquí
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      users.value = data.map(user => ({
-        id: user.id,  // Tomamos el ID
-        name: user.name,  // Tomamos el nombre
-        email: user.email,  // Tomamos el correo
-        status: 'Actiu',  // Cambiamos el estado a "Actiu" para todos
-        statusClass: 'status-active'  // La clase para el estado "Actiu"
-      }));
-    } else {
-      console.error('Error al obtener los usuarios:', response.statusText);
-    }
+    users.value = await authStore.fetchUsers(); // Llamamos la función desde el store
   } catch (error) {
-    console.error('Error al obtener los usuarios:', error);
+    console.error('Error al obtener usuarios:', error);
   }
 };
 
@@ -52,8 +32,7 @@ const filteredUsers = computed(() => {
   if (searchQuery.value) {
     filtered = filtered.filter(user =>
       user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      user.dni?.toLowerCase().includes(searchQuery.value.toLowerCase())
+      user.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
   }
 
@@ -106,7 +85,7 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
               <th>ID</th>
               <th>Nom</th>
               <th>Correu Electrònic</th>
-              <th>Estat</th> <!-- Nueva columna "Estat" -->
+              <th>Estat</th>
               <th>Accions</th>
             </tr>
           </thead>
@@ -116,7 +95,6 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
               <td>
-                <!-- Columna para mostrar el estado -->
                 <span :class="user.statusClass">{{ user.status }}</span>
               </td>
               <td>
@@ -138,6 +116,7 @@ const viewDetails = (user) => console.log('Veure detalls de l\'usuari', user);
     </div>
   </div>
 </template>
+
 
 <style scoped>
   /* Estilos comunes */

@@ -126,6 +126,32 @@ export const useAuthStore = defineStore('auth', {
       theaterStore.selectedSeats = seats;  // Sincronizar con theaterStore
     },
 
+    async fetchUsers() {
+      try {
+        const response = await $fetch('http://127.0.0.1:8000/api/users', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (response) {
+          console.log('Usuarios cargados:', response);
+          return response.map(user => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            status: 'Actiu', // Puedes cambiar esto si tienes un campo de estado en la API
+            statusClass: 'status-active'
+          }));
+        }
+      } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        return [];
+      }
+    },
+
     // Realizar compra de entradas
     async purchaseTickets() {
       if (!this.user) {
