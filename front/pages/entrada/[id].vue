@@ -250,7 +250,6 @@ const generateTicketQRs = async (reservationData) => {
     seats: seatsWithQRs
   };
 };
-
 const sendEmail = async () => {
   const authStore = useAuthStore();
   isSendingEmail.value = true;
@@ -278,23 +277,24 @@ const sendEmail = async () => {
   };
 
   try {
+    // Validate user email
     const userEmail = authStore.user?.email;
-
     if (!userEmail) {
-      throw new Error('No se encontró un correo electrónico para el usuario');
+      throw new Error('No s\'ha trobat un correu electrònic per a l\'usuari');
     }
 
+    // Prepare reservation data
     const basicReservationData = {
       user_id: authStore.user?.id || 1, 
       session_id: theaterStore.currentSession?.id || 123, 
-      movie_title: theaterStore.currentMovie?.title || 'Película',
+      movie_title: theaterStore.currentMovie?.title || 'Pel·lícula',
       date: formatDate(sessionDate.value), 
       time: formatTime(sessionTime.value), 
       room: theaterRoom.value || 'Sala 1', 
       seats: theaterStore.selectedSeats.map(seat => ({
         row: seat.row,
         number: seat.seat,
-        type: theaterStore.isVipSeat(seat.row, seat.seat) ? 'VIP' : 'Estándar',
+        type: theaterStore.isVipSeat(seat.row, seat.seat) ? 'VIP' : 'Estàndard',
         price: theaterStore.getPricePerSeat(seat.row)
       })),
       total_price: theaterStore.totalPrice,
@@ -304,25 +304,16 @@ const sendEmail = async () => {
     // Generate QR codes for tickets
     const reservationDataWithQRs = await generateTicketQRs(basicReservationData);
 
-    const response = await fetch('http://localhost:8000/api/send-ticket-email', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reservationDataWithQRs),
-    });
+    // Use the new sendTicketEmail method from the auth store
+    const response = await authStore.sendTicketEmail(reservationDataWithQRs);
 
-    const responseData = await response.json();
+    // Show success popup
+    showPopup('📩 Correu enviat amb èxit!', 'success');
 
-    if (responseData.message === "Correo enviado con éxito") {
-      showPopup('📩 Correu enviat amb èxit!', 'success');
-        } else {
-      throw new Error(responseData.message || 'Error desconocido');
-    }
   } catch (error) {
-    console.error('Error completo:', error);
-    showPopup(`❌ No se pudo enviar el correo: ${error.message}`, 'error');
-    } finally {
+    console.error('Error complet:', error);
+    showPopup(`❌ No s'ha pogut enviar el correu: ${error.message}`, 'error');
+  } finally {
     isSendingEmail.value = false;
   }
 };

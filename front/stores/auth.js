@@ -103,6 +103,36 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async sendTicketEmail(reservationData) {
+      try {
+        // Ensure user is authenticated
+        if (!this.isAuthenticated) {
+          throw new Error('Usuario no autenticado');
+        }
+
+        // Add user's email to reservation data if not already present
+        if (!reservationData.email && this.user?.email) {
+          reservationData.email = this.user.email;
+        }
+
+        const response = await $fetch('http://localhost:8000/api/send-ticket-email', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
+          },
+          body: reservationData,
+        });
+
+        // Return the response from the server
+        return response;
+
+      } catch (error) {
+        console.error('❌ Error enviando correo de entradas:', error);
+        throw error;
+      }
+    },
+
     // Selección de película
     selectMovie(movie) {
       console.log('Película seleccionada:', movie);
