@@ -121,7 +121,7 @@ L'objectiu principal del projecte és desenvolupar una aplicació completa per a
 - **GET** `/api/reservations` → Llistar reserves.
 
 ### 🛠️ Administrador
-- **GET** `/admin/dashboard` → Panell d'administració (requereix autenticació).
+- **GET** `/admin` → Panell d'administració (requereix autenticació).
 
 ---
 
