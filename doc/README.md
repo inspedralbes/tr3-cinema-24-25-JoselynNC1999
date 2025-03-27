@@ -1,22 +1,8 @@
-# Documentació
-Llistat d'alguns dels punts que han de quedar explicats en aquesta carpeta. Poden ser tots en aquest fitxer o en diversos fitxers enllaçats.
+# 🎥 **Cinépolis Pedralbes **  
 
-És obligatori modificar aquest document!!
+📍 *Gestió de cinema intel·ligent i reserves en línia*  
 
-## Documentació bàsica MÍNIMA
- * Objectius
- * Arquitectura bàsica
-   * Tecnologies utilitzades
-   * Interrelació entre els diversos components
- * Com crees l'entorn de desenvolupament
- * Com desplegues l'aplicació a producció
- * Llistat d'endpoints de l'API de backend
-    * Rutes
-   * Exemples de JSON de peticó
-   * Exemples de JSON de resposta i els seus codis d'estat 200? 404?
- * Aplicació Android
- * Altres elements importants.
- * ...
+---
 # 📖 Documentació Tècnica del Projecte de Cinema
 
 Aquest document conté la informació tècnica necessària per entendre i treballar amb el projecte del cinema. Inclou detalls sobre els objectius, l'arquitectura, l'entorn de desenvolupament, el desplegament i altres aspectes importants.
