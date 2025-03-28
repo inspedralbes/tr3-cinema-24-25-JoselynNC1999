@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
 
-const API_URL = 'http://localhost:8000/api'; // URL base de la API
+const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'; // URL base de la API
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({

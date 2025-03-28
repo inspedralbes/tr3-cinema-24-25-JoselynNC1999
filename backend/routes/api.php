@@ -12,6 +12,9 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\MovieSessionController; // Asegurar que se importe
 
+Route::middleware('cors')->group(function () {
+    // Aquí puedes agregar las rutas que necesiten el middleware CORS
+
 // 🟢 Rutas de Autenticación
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -68,3 +71,4 @@ Route::middleware('auth:sanctum')->put('/users/{user}', [UserController::class, 
 Route::middleware('auth:sanctum')->delete('/users/{user}', [UserController::class, 'destroy']);
 
 
+});

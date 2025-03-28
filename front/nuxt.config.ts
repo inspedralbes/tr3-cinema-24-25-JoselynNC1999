@@ -6,4 +6,6 @@ export default defineNuxtConfig({
   // (Opcional) Si quieres personalizar tu archivo CSS principal
   css: ['@/assets/css/main.css'],
 
+  ssr: false,
+
 })

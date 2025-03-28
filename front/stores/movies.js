@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-const API_URL = 'http://localhost:8000/api' // URL base de la API
+const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api' // URL base de la API
 
 export const useMovieStore = defineStore('movies', () => {
   // State
