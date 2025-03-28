@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
 
-const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'; // URL base de la API
+const API_URL = 'https://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, ''); // URL base de la API
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', {
     // Registro de usuario
     async register(user) {
       try {
-        const response = await $fetch(`${API_URL}/register`, {
+        const response = await $fetch(`${API_URL}/register`.replace(/\/\//g, '/'), {
           method: 'POST',
           body: user,
         });
@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
     // Login de usuario
     async login(credentials) {
       try {
-        const response = await $fetch(`${API_URL}/login`, {
+        const response = await $fetch(`${API_URL}/login`.replace(/\/\//g, '/'), {
           method: 'POST',
           body: credentials,
         });
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
     // Logout de usuario
     async logout() {
       try {
-        await $fetch(`${API_URL}/logout`, {
+        await $fetch(`${API_URL}/logout`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
         });
@@ -116,7 +116,7 @@ export const useAuthStore = defineStore('auth', {
           reservationData.email = this.user.email;
         }
 
-        const response = await $fetch(`${API_URL}/send-ticket-email`, {
+        const response = await $fetch(`${API_URL}/send-ticket-email`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUsers() {
       try {
-        const response = await $fetch(`${API_URL}/users`, {
+        const response = await $fetch(`${API_URL}/users`.replace(/\/\//g, '/'), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -193,7 +193,7 @@ export const useAuthStore = defineStore('auth', {
 
     
       try {
-        const response = await $fetch(`${API_URL}/purchase`, {
+        const response = await $fetch(`${API_URL}/purchase`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
           body: {

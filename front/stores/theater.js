@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useAuthStore } from './auth'; 
 
 // Define base API URL directly
-const BASE_API_URL = 'cinepolisback.daw.inspedralbes.cat/api';
+const BASE_API_URL = 'https://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, '');
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -63,7 +63,7 @@ export const useTheaterStore = defineStore('theater', {
   actions: {
     async fetchSeats(sessionId) {
       try {
-        const response = await fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`);
+        const response = await fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`.replace(/\/\//g, '/'));
         if (!response.ok) throw new Error('Error al obtener los asientos');
     
         let seats = await response.json();
