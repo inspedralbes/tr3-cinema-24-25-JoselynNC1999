@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
 
-const API_URL = 'https://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, ''); // URL base de la API
+const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, ''); // URL base de la API
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -161,7 +161,8 @@ export const useAuthStore = defineStore('auth', {
           headers: {
             'Authorization': `Bearer ${this.token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          redirect: 'follow'
         });
     
         if (response) {
@@ -202,6 +203,7 @@ export const useAuthStore = defineStore('auth', {
             session_id: this.selectedSession.id,
             seats: this.selectedSeats,
           },
+          redirect: 'follow'
         });
 
         alert('Compra realizada con éxito');

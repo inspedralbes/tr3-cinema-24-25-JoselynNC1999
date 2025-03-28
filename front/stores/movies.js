@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-const API_URL = 'https://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, '') // URL base de la API
+const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, '') // URL base de la API
 
 export const useMovieStore = defineStore('movies', () => {
   // State
@@ -19,11 +19,12 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
         },
+        redirect: 'follow'
       })
 
       if (!response.ok) throw new Error(`Error en la API (${response.status})`)
@@ -68,11 +69,12 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await fetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
         },
+        redirect: 'follow'
       })
 
       if (!response.ok) throw new Error(`Error en la API (${response.status})`)
