@@ -22,7 +22,7 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      const response = await useFetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -72,7 +72,7 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
+      const response = await useFetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
