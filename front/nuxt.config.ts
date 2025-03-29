@@ -10,7 +10,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: 'http://cinepolisback.daw.inspedralbes.cat/api'
+      apiBase: 'https://cinepolisback.daw.inspedralbes.cat/api'
     }
   }
 
