@@ -15,7 +15,7 @@ export const useSessionStore = defineStore('sessions', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/${endpoint}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -37,12 +37,12 @@ export const useSessionStore = defineStore('sessions', () => {
 
   // Obtener todas las sesiones
   const fetchAllSessions = async () => {
-    await fetchData('sessions', sessions)
+    await fetchData('http://cinepolisback.daw.inspedralbes.cat/api/sessions', sessions)
   }
 
   // Obtener sesiones por ID de película
   const fetchSessions = async (movieId) => {
-    await fetchData(`sessions?movie_id=${movieId}`, sessions)
+    await fetchData(`http://cinepolisback.daw.inspedralbes.cat/api/sessions?movie_id=${movieId}`, sessions)
   }
 
   // Obtener fechas desde la API

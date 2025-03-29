@@ -19,7 +19,7 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/${endpoint}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -41,7 +41,7 @@ export const useMovieStore = defineStore('movies', () => {
 
   // ✅ Cargar todas las películas (con paginación)
   const fetchMovies = async (page = 1) => {
-    await fetchData(`movies?page=${page}`, movies, (data) => {
+    await fetchData(`http://cinepolisback.daw.inspedralbes.cat/api/movies?page=${page}`, movies, (data) => {
       const processedMovies = data.map(movie => ({
         ...movie,
         poster_url: movie.poster_url || 'https://via.placeholder.com/300x450?text=No+Image'
@@ -69,7 +69,7 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/movies/${id}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',

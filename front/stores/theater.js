@@ -63,7 +63,7 @@ export const useTheaterStore = defineStore('theater', {
   actions: {
     async fetchSeats(sessionId) {
       try {
-        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`.replace(/\/\//g, '/'));
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions/${sessionId}/seats`.replace(/\/\//g, '/'));
         if (!response.ok) throw new Error('Error al obtener los asientos');
     
         let seats = await response.json();
@@ -83,7 +83,7 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieById(movieId) {
       try {
         console.log(`Fetching movie with ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`);
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/movies/${movieId}`);
         if (!response.ok) throw new Error('Error al obtener la película');
         const data = await response.json();
         console.log('Movie fetched:', data);
@@ -96,7 +96,7 @@ export const useTheaterStore = defineStore('theater', {
     async fetchSessionByMovieId(movieId) {
       try {
         console.log(`Fetching session for movie ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/sessions?movieId=${movieId}`);
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions?movieId=${movieId}`);
         
         if (!response.ok) throw new Error('Error al obtener la sesión');
         
@@ -116,7 +116,7 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieDetails(movieId) {
       try {
         console.log(`Fetching movie details for movie ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`);
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/movies/${movieId}`);
         
         if (!response.ok) throw new Error('Error al obtener la película');
         
@@ -131,7 +131,7 @@ export const useTheaterStore = defineStore('theater', {
     
     async fetchOccupiedSeats(sessionId) {
       try {
-        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/occupied-seats`);
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions/${sessionId}/occupied-seats`);
         if (!response.ok) throw new Error("Error al obtener asientos ocupados");
     
         let seats = await response.json();
@@ -192,7 +192,7 @@ export const useTheaterStore = defineStore('theater', {
     
         console.log("Reservando asientos con IDs:", seatIds);
     
-        const response = await $fetch(`${BASE_API_URL}/reserve-seats`, {
+        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/reserve-seats`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
