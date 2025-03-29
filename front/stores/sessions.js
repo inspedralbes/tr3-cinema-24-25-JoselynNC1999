@@ -17,8 +17,8 @@ export const useSessionStore = defineStore('sessions', () => {
     try {
       loading.value = true
       error.value = null
-
-      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      const url = new URL(`${API_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`);
+      const response = await $fetch(url.toString(), {
         method: 'GET',
         headers: {
           Accept: 'application/json',

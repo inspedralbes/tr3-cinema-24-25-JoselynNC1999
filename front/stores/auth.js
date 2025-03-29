@@ -23,7 +23,8 @@ export const useAuthStore = defineStore('auth', {
     // Registro de usuario
     async register(user) {
       try {
-        const response = await $fetch(`${API_URL}/register`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/register`);
+        const response = await $fetch(url.toString(), {
           method: 'POST',
           body: user,
           redirect: 'follow',
@@ -49,7 +50,8 @@ export const useAuthStore = defineStore('auth', {
     // Login de usuario
     async login(credentials) {
       try {
-        const response = await $fetch(`${API_URL}/login`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/login`);
+        const response = await $fetch(url.toString(), {
           method: 'POST',
           body: credentials,
           redirect: 'follow',
@@ -86,7 +88,8 @@ export const useAuthStore = defineStore('auth', {
     // Logout de usuario
     async logout() {
       try {
-        await $fetch(`${API_URL}/logout`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/logout`);
+        await $fetch(url.toString(), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
           redirect: 'follow',
@@ -122,7 +125,8 @@ export const useAuthStore = defineStore('auth', {
           reservationData.email = this.user.email;
         }
 
-        const response = await $fetch(`${API_URL}/send-ticket-email`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/send-ticket-email`);
+        const response = await $fetch(url.toString(), {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -163,7 +167,8 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUsers() {
       try {
-        const response = await $fetch(`${API_URL}/users`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/users`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -201,7 +206,8 @@ export const useAuthStore = defineStore('auth', {
 
     
       try {
-        const response = await $fetch(`${API_URL}/purchase`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/purchase`);
+        const response = await $fetch(url.toString(), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
           body: {

@@ -64,7 +64,8 @@ export const useTheaterStore = defineStore('theater', {
   actions: {
     async fetchSeats(sessionId) {
       try {
-        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`.replace(/\/\//g, '/'), {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/sessions/${sessionId}/seats`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -90,7 +91,8 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieById(movieId) {
       try {
         console.log(`Fetching movie with ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`, {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/movies/${movieId}`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -109,7 +111,8 @@ export const useTheaterStore = defineStore('theater', {
     async fetchSessionByMovieId(movieId) {
       try {
         console.log(`Fetching session for movie ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/sessions?movieId=${movieId}`, {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/sessions?movieId=${movieId}`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -135,7 +138,8 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieDetails(movieId) {
       try {
         console.log(`Fetching movie details for movie ID: ${movieId}`);
-        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`, {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/movies/${movieId}`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -156,7 +160,8 @@ export const useTheaterStore = defineStore('theater', {
     
     async fetchOccupiedSeats(sessionId) {
       try {
-        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/occupied-seats`, {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/sessions/${sessionId}/occupied-seats`);
+        const response = await $fetch(url.toString(), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -223,7 +228,8 @@ export const useTheaterStore = defineStore('theater', {
     
         console.log("Reservando asientos con IDs:", seatIds);
     
-        const response = await $fetch(`${BASE_API_URL}/reserve-seats`, {
+        const url = new URL(`${API_URL.replace(/\/$/, '')}/reserve-seats`);
+        const response = await $fetch(url.toString(), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
