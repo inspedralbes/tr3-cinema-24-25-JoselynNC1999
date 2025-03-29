@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#app'
 
 // Define base API URL directly
 const config = useRuntimeConfig();
-const API_URL = config.public.apiBase.replace(/\/$/, '') // URL base de la API
+const API_URL = config.public.apiBase // URL base de la API
 
 export const useMovieStore = defineStore('movies', () => {
   // State
@@ -21,8 +21,9 @@ export const useMovieStore = defineStore('movies', () => {
     try {
       loading.value = true
       error.value = null
-
-      const response = await useFetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
+      
+      const url = new URL(`${API_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`);
+      const response = await $fetch(url.toString(), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -44,8 +45,6 @@ export const useMovieStore = defineStore('movies', () => {
 
   // ✅ Cargar todas las películas (con paginación)
   const fetchMovies = async (page = 1) => {
-    const response2 = await $fetch('https://pokeapi.co/api/v2/pokemon/ditto');
-    console.log('Response pokemon:', response2);
     await fetchData(`movies?page=${page}`, movies, (data) => {
       const processedMovies = data.map(movie => ({
         ...movie,
@@ -74,7 +73,9 @@ export const useMovieStore = defineStore('movies', () => {
       loading.value = true
       error.value = null
 
-      const response = await useFetch(`${API_URL}/movies/${id}`.replace(/\/\//g, '/'), {
+      const url = new URL(`${API_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`);
+
+      const response = await $fetch(url.toString(), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
