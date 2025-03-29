@@ -1,9 +1,10 @@
-// stores/theater.js
 import { defineStore } from 'pinia';
 import { useAuthStore } from './auth'; 
+import { useRuntimeConfig } from 'vue';
 
 // Define base API URL directly
-const BASE_API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, '');
+const config = useRuntimeConfig()
+const BASE_API_URL = config.public.apiBase.replace(/\/$/, '');
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -63,7 +64,13 @@ export const useTheaterStore = defineStore('theater', {
   actions: {
     async fetchSeats(sessionId) {
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions/${sessionId}/seats`.replace(/\/\//g, '/'));
+        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/seats`.replace(/\/\//g, '/'), {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+          redirect: 'follow'
+        });
         if (!response.ok) throw new Error('Error al obtener los asientos');
     
         let seats = await response.json();
@@ -83,7 +90,13 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieById(movieId) {
       try {
         console.log(`Fetching movie with ID: ${movieId}`);
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/movies/${movieId}`);
+        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+          redirect: 'follow'
+        });
         if (!response.ok) throw new Error('Error al obtener la película');
         const data = await response.json();
         console.log('Movie fetched:', data);
@@ -96,7 +109,13 @@ export const useTheaterStore = defineStore('theater', {
     async fetchSessionByMovieId(movieId) {
       try {
         console.log(`Fetching session for movie ID: ${movieId}`);
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions?movieId=${movieId}`);
+        const response = await $fetch(`${BASE_API_URL}/sessions?movieId=${movieId}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+          redirect: 'follow'
+        });
         
         if (!response.ok) throw new Error('Error al obtener la sesión');
         
@@ -116,7 +135,13 @@ export const useTheaterStore = defineStore('theater', {
     async fetchMovieDetails(movieId) {
       try {
         console.log(`Fetching movie details for movie ID: ${movieId}`);
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/movies/${movieId}`);
+        const response = await $fetch(`${BASE_API_URL}/movies/${movieId}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+          redirect: 'follow'
+        });
         
         if (!response.ok) throw new Error('Error al obtener la película');
         
@@ -131,7 +156,13 @@ export const useTheaterStore = defineStore('theater', {
     
     async fetchOccupiedSeats(sessionId) {
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/sessions/${sessionId}/occupied-seats`);
+        const response = await $fetch(`${BASE_API_URL}/sessions/${sessionId}/occupied-seats`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+          redirect: 'follow'
+        });
         if (!response.ok) throw new Error("Error al obtener asientos ocupados");
     
         let seats = await response.json();
@@ -192,7 +223,7 @@ export const useTheaterStore = defineStore('theater', {
     
         console.log("Reservando asientos con IDs:", seatIds);
     
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/reserve-seats`, {
+        const response = await $fetch(`${BASE_API_URL}/reserve-seats`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -200,6 +231,7 @@ export const useTheaterStore = defineStore('theater', {
             session_id: this.currentSession.id,
             seat_ids: seatIds,
           }),
+          redirect: "follow"
         });
     
         const data = await response.json();

@@ -8,4 +8,10 @@ export default defineNuxtConfig({
 
   ssr: false,
 
+  runtimeConfig: {
+    public: {
+      apiBase: 'http://cinepolisback.daw.inspedralbes.cat/api'
+    }
+  }
+
 })

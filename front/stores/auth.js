@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
+import { useRuntimeConfig } from 'vue';
 
-const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, ''); // URL base de la API
+// Define base API URL directly
+const config = useRuntimeConfig()
+const API_URL = config.public.apiBase.replace(/\/$/, ''); // URL base de la API
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -20,9 +23,10 @@ export const useAuthStore = defineStore('auth', {
     // Registro de usuario
     async register(user) {
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/register`.replace(/\/\//g, '/'), {
+        const response = await $fetch(`${API_URL}/register`.replace(/\/\//g, '/'), {
           method: 'POST',
           body: user,
+          redirect: 'follow',
         });
 
         this.token = response.token;
@@ -45,9 +49,10 @@ export const useAuthStore = defineStore('auth', {
     // Login de usuario
     async login(credentials) {
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/login`.replace(/\/\//g, '/'), {
+        const response = await $fetch(`${API_URL}/login`.replace(/\/\//g, '/'), {
           method: 'POST',
           body: credentials,
+          redirect: 'follow',
         });
 
         this.token = response.token;
@@ -81,9 +86,10 @@ export const useAuthStore = defineStore('auth', {
     // Logout de usuario
     async logout() {
       try {
-        await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/logout`.replace(/\/\//g, '/'), {
+        await $fetch(`${API_URL}/logout`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
+          redirect: 'follow',
         });
 
         this.token = null;
@@ -116,13 +122,14 @@ export const useAuthStore = defineStore('auth', {
           reservationData.email = this.user.email;
         }
 
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/send-ticket-email`.replace(/\/\//g, '/'), {
+        const response = await $fetch(`${API_URL}/send-ticket-email`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.token}`
           },
           body: reservationData,
+          redirect: 'follow',
         });
 
         // Return the response from the server
@@ -156,7 +163,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUsers() {
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/users`.replace(/\/\//g, '/'), {
+        const response = await $fetch(`${API_URL}/users`.replace(/\/\//g, '/'), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -194,7 +201,7 @@ export const useAuthStore = defineStore('auth', {
 
     
       try {
-        const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/purchase`.replace(/\/\//g, '/'), {
+        const response = await $fetch(`${API_URL}/purchase`.replace(/\/\//g, '/'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.token}` },
           body: {

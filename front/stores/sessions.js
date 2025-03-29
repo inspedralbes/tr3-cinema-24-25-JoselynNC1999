@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, useRuntimeConfig } from 'vue'
 
-const API_URL = 'http://cinepolisback.daw.inspedralbes.cat/api'.replace(/\/$/, '') // URL base de la API
+// Define base API URL directly
+const config = useRuntimeConfig()
+const API_URL = config.public.apiBase.replace(/\/$/, '') // URL base de la API
 
 export const useSessionStore = defineStore('sessions', () => {
   const sessions = ref([])
@@ -15,7 +17,7 @@ export const useSessionStore = defineStore('sessions', () => {
       loading.value = true
       error.value = null
 
-      const response = await $fetch(`http://cinepolisback.daw.inspedralbes.cat/api/${endpoint}`.replace(/\/\//g, '/'), {
+      const response = await $fetch(`${API_URL}/${endpoint}`.replace(/\/\//g, '/'), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -37,12 +39,12 @@ export const useSessionStore = defineStore('sessions', () => {
 
   // Obtener todas las sesiones
   const fetchAllSessions = async () => {
-    await fetchData('http://cinepolisback.daw.inspedralbes.cat/api/sessions', sessions)
+    await fetchData('sessions', sessions)
   }
 
   // Obtener sesiones por ID de película
   const fetchSessions = async (movieId) => {
-    await fetchData(`http://cinepolisback.daw.inspedralbes.cat/api/sessions?movie_id=${movieId}`, sessions)
+    await fetchData(`sessions?movie_id=${movieId}`, sessions)
   }
 
   // Obtener fechas desde la API
