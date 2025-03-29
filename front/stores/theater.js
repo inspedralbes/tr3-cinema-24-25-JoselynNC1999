@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#app'
 
 // Define base API URL directly
 const config = useRuntimeConfig()
-const BASE_API_URL = config.public.apiBase.replace(/\/$/, '');
+const API_URL = config.public.apiBase.replace(/\/$/, '');
 
 export const useTheaterStore = defineStore('theater', {
   state: () => ({
@@ -72,9 +72,9 @@ export const useTheaterStore = defineStore('theater', {
           },
           redirect: 'follow'
         });
-        if (!response.ok) throw new Error('Error al obtener los asientos');
+        if (response.length <= 0) throw new Error('Error al obtener los asientos');
     
-        let seats = await response.json();
+        let seats = response
         console.log('Seats response:', seats);
     
         if (!Array.isArray(seats)) seats = [seats];
@@ -99,8 +99,8 @@ export const useTheaterStore = defineStore('theater', {
           },
           redirect: 'follow'
         });
-        if (!response.ok) throw new Error('Error al obtener la película');
-        const data = await response.json();
+        if (response.length <= 0) throw new Error('Error al obtener la película');
+        const data = response;
         console.log('Movie fetched:', data);
         this.currentMovie = data;
       } catch (error) {
@@ -120,9 +120,9 @@ export const useTheaterStore = defineStore('theater', {
           redirect: 'follow'
         });
         
-        if (!response.ok) throw new Error('Error al obtener la sesión');
+        if (response.length <= 0) throw new Error('Error al obtener la sesión');
         
-        const sessions = await response.json();
+        const sessions = response;
         console.log('Sessions fetched:', sessions);
         
         this.currentSession = sessions.length ? sessions[0] : null;
@@ -147,9 +147,9 @@ export const useTheaterStore = defineStore('theater', {
           redirect: 'follow'
         });
         
-        if (!response.ok) throw new Error('Error al obtener la película');
+        if (response.length <= 0) throw new Error('Error al obtener la película');
         
-        const movie = await response.json();
+        const movie = response;
         console.log('Movie details fetched:', movie);
         
         this.movieDetails = movie;
@@ -168,9 +168,9 @@ export const useTheaterStore = defineStore('theater', {
           },
           redirect: 'follow'
         });
-        if (!response.ok) throw new Error("Error al obtener asientos ocupados");
+        if (response.length <= 0) throw new Error("Error al obtener asientos ocupados");
     
-        let seats = await response.json();
+        let seats = response;
         console.log("Occupied seats response:", seats);
     
         if (!Array.isArray(seats)) seats = [seats];
@@ -240,8 +240,8 @@ export const useTheaterStore = defineStore('theater', {
           redirect: "follow"
         });
     
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Error al reservar butacas");
+        const data = response;
+        if (response.length <= 0) throw new Error(data.message || "Error al reservar butacas");
         setTimeout(() => {
           this.selectedSeats = [];
           this.fetchSeats(this.currentSession.id);

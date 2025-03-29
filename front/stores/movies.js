@@ -83,8 +83,8 @@ export const useMovieStore = defineStore('movies', () => {
         redirect: 'follow'
       })
 
-      if (!response.ok) throw new Error(`Error en la API (${response.status})`)
-      const movie = await response.json()
+      if (response.length <= 0) throw new Error(`Error en la API (${response.status})`)
+      const movie = response
 
       if (!getMovieById(id)) {
         movies.value.push(movie)

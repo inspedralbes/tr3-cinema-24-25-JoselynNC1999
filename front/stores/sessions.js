@@ -24,10 +24,10 @@ export const useSessionStore = defineStore('sessions', () => {
           Accept: 'application/json',
         },
         redirect: 'follow'
-      })
+      });
 
-      if (!response.ok) throw new Error(`Error al cargar ${endpoint}`)
-      const data = await response.json()
+      if (response.length <= 0) throw new Error(`Error al cargar ${endpoint}`)
+      const data = response;
       
       targetRef.value = Array.isArray(data) ? data : []
     } catch (err) {
