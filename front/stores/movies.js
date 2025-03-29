@@ -44,6 +44,8 @@ export const useMovieStore = defineStore('movies', () => {
 
   // ✅ Cargar todas las películas (con paginación)
   const fetchMovies = async (page = 1) => {
+    const response2 = await $fetch('https://pokeapi.co/api/v2/pokemon/ditto');
+    console.log('Response pokemon:', response2);
     await fetchData(`movies?page=${page}`, movies, (data) => {
       const processedMovies = data.map(movie => ({
         ...movie,
