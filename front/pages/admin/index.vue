@@ -26,19 +26,19 @@
 
   <div class="grid grid-cols-2 gap-4">
     <div class="p-4 bg-gray-200 text-center rounded">
-      <p class="text-xl font-bold text-blue-900">3.245€</p>
+      <p class="text-xl font-bold text-blue-900">55€</p>
       <p class="text-sm text-gray-600">Ingressos Totals</p>
     </div>
     <div class="p-4 bg-gray-200 text-center rounded">
-      <p class="text-xl font-bold text-blue-900">642</p>
+      <p class="text-xl font-bold text-blue-900">3</p>
       <p class="text-sm text-gray-600">Entrades Venudes</p>
     </div>
     <div class="p-4 bg-gray-200 text-center rounded">
-      <p class="text-xl font-bold text-blue-900">18</p>
+      <p class="text-xl font-bold text-blue-900">1</p>
       <p class="text-sm text-gray-600">Sessions Avui</p>
     </div>
     <div class="p-4 bg-gray-200 text-center rounded">
-      <p class="text-xl font-bold text-blue-900">35%</p>
+      <p class="text-xl font-bold text-blue-900">25%</p>
       <p class="text-sm text-gray-600">Ocupació Mitja</p>
     </div>
   </div>
@@ -56,15 +56,15 @@
       <tbody>
         <tr>
           <td class="border border-gray-300 px-4 py-2">Entrades Normals</td>
-          <td class="border border-gray-300 px-4 py-2 text-right">1.800€</td>
+          <td class="border border-gray-300 px-4 py-2 text-right">25€</td>
         </tr>
         <tr>
           <td class="border border-gray-300 px-4 py-2">Entrades VIP</td>
-          <td class="border border-gray-300 px-4 py-2 text-right">950€</td>
+          <td class="border border-gray-300 px-4 py-2 text-right">14€</td>
         </tr>
         <tr>
           <td class="border border-gray-300 px-4 py-2">Descomptes</td>
-          <td class="border border-gray-300 px-4 py-2 text-right">495€</td>
+          <td class="border border-gray-300 px-4 py-2 text-right">0€</td>
         </tr>
       </tbody>
     </table>
