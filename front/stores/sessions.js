@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, useRuntimeConfig } from 'vue'
+import { ref } from 'vue'
+import { useRuntimeConfig } from '#app'
 
 // Define base API URL directly
 const config = useRuntimeConfig()

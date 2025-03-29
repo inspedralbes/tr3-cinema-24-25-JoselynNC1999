@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './auth'; 
-import { useRuntimeConfig } from 'vue';
+import { useRuntimeConfig } from '#app'
 
 // Define base API URL directly
 const config = useRuntimeConfig()

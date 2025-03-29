@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useTheaterStore } from './theater';
-import { useRuntimeConfig } from 'vue';
+import { useRuntimeConfig } from '#app'
 
 // Define base API URL directly
 const config = useRuntimeConfig()
